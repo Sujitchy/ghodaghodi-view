@@ -1,0 +1,12 @@
+{
+  "name": "ghodaghodi-view",
+  "version": "1.0.0",
+  "description": "WordPress theme for Ghodaghodi tourism profile",
+  "scripts": {
+    "build": "npx tailwindcss -i ./src/input.css -o ./assets/css/style.css --minify",
+    "watch": "npx tailwindcss -i ./src/input.css -o ./assets/css/style.css --watch"
+  },
+  "devDependencies": {
+    "tailwindcss": "^3.4.17"
+  }
+}
