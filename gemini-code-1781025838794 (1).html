@@ -1,0 +1,199 @@
+<!DOCTYPE html>
+<html lang="ne">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>पर्यटन प्रोफाइल - घोडाघोडी नगरपालिका</title>
+    <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Mukta:wght@300;400;600;700&display=swap');
+        body { font-family: 'Mukta', sans-serif; }
+    </style>
+</head>
+<body class="bg-gray-50 text-gray-800">
+
+    <header class="bg-emerald-900 text-white sticky top-0 z-50 shadow-md">
+        <div class="container mx-auto px-4 py-3 flex justify-between items-center">
+            <div class="flex items-center space-x-3">
+                <i class="fa-solid fa-tree-city text-2xl text-amber-400"></i>
+                <span class="text-xl font-bold tracking-wide">घोडाघोडी पर्यटन प्रोफाइल</span>
+            </div>
+            <nav class="hidden md:flex space-x-6 text-sm font-semibold">
+                <a href="#dashboard" class="hover:text-amber-400 transition">ड्यासबोर्ड</a>
+                <a href="#destinations" class="hover:text-amber-400 transition">गन्तव्यहरू</a>
+                <a href="#hotels" class="hover:text-amber-400 transition">होटल तथा होमस्टे</a>
+                <a href="#qr-section" class="hover:text-amber-400 transition">डिजिटल क्युआर</a>
+            </nav>
+        </div>
+    </header>
+
+    <section class="relative bg-emerald-950 text-white py-20 px-4 text-center">
+        <div class="absolute inset-0 opacity-20 bg-[url('https://images.unsplash.com/photo-1507525428034-b723cf961d3e?auto=format&fit=crop&w=1200&q=80')] bg-cover bg-center"></div>
+        <div class="relative container mx-auto max-w-3xl">
+            <span class="bg-amber-500 text-emerald-950 text-xs font-bold px-3 py-1 rounded-full uppercase tracking-wider">विश्व रामसार क्षेत्र</span>
+            <h1 class="text-4xl md:text-5xl font-extrabold mt-4 mb-6 leading-tight text-amber-400">संरक्षण सहितको पर्या-पर्यटन र संस्कृति</h1>
+            <p class="text-base md:text-lg text-emerald-100 opacity-90 leading-relaxed">
+                घोडाघोडी नगरपालिकाका प्राकृतिक तालतलैया, दुर्लभ जैविक विविधता, र मौलिक थารु संस्कृतिको आधिकारिक डिजिटल प्रोफाइल पोर्टल।
+            </p>
+        </div>
+    </section>
+
+    <section id="dashboard" class="container mx-auto px-4 -mt-8 relative z-10">
+        <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+            <div class="bg-white p-6 rounded-xl shadow-lg border-t-4 border-emerald-600 text-center">
+                <i class="fa-solid fa-map-location-dot text-3xl text-emerald-600 mb-2"></i>
+                <h3 class="text-2xl font-bold text-gray-900">२४+</h3>
+                <p class="text-xs text-gray-500 font-semibold uppercase">कुल पर्यटकीय क्षेत्र</p>
+            </div>
+            <div class="bg-white p-6 rounded-xl shadow-lg border-t-4 border-amber-500 text-center">
+                <i class="fa-solid fa-hotel text-3xl text-amber-500 mb-2"></i>
+                <h3 class="text-2xl font-bold text-gray-900">१५+</h3>
+                <p class="text-xs text-gray-500 font-semibold uppercase">दर्ता भएका होमस्टे/होटल</p>
+            </div>
+            <div class="bg-white p-6 rounded-xl shadow-lg border-t-4 border-blue-500 text-center">
+                <i class="fa-solid fa-dove text-3xl text-blue-500 mb-2"></i>
+                <h3 class="text-2xl font-bold text-gray-900">२९०+</h3>
+                <p class="text-xs text-gray-500 font-semibold uppercase">चराका प्रजातिहरू</p>
+            </div>
+            <div class="bg-white p-6 rounded-xl shadow-lg border-t-4 border-purple-500 text-center">
+                <i class="fa-solid fa-users text-3xl text-purple-500 mb-2"></i>
+                <h3 class="text-2xl font-bold text-gray-900">५०K+</h3>
+                <p class="text-xs text-gray-500 font-semibold uppercase">वार्षिक पर्यटक (अनुमानित)</p>
+            </div>
+        </div>
+    </section>
+
+    <main class="container mx-auto px-4 py-12">
+        
+        <section id="destinations" class="mb-16">
+            <div class="flex flex-col md:flex-row justify-between items-start md:items-center mb-8 gap-4">
+                <div>
+                    <h2 class="text-2xl font-bold text-emerald-950 flex items-center gap-2">
+                        <i class="fa-solid fa-compass text-amber-500"></i> प्रमुख गन्तव्यहरू अन्वेषण गर्नुहोस्
+                    </h2>
+                    <p class="text-sm text-gray-500 mt-1">नगरपालिका भित्रका विभिन्न विधाका पर्यटकीय स्थलहरू</p>
+                </div>
+                <div class="flex flex-wrap gap-2 text-xs font-semibold">
+                    <button class="bg-emerald-800 text-white px-4 py-2 rounded-lg shadow-sm">सबै क्षेत्र</button>
+                    <button class="bg-white text-gray-700 px-4 py-2 rounded-lg shadow-sm border border-gray-200 hover:bg-emerald-50">प्राकृतिक</button>
+                    <button class="bg-white text-gray-700 px-4 py-2 rounded-lg shadow-sm border border-gray-200 hover:bg-emerald-50">धार्मिक</button>
+                    <button class="bg-white text-gray-700 px-4 py-2 rounded-lg shadow-sm border border-gray-200 hover:bg-emerald-50">सांस्कृतिक</button>
+                </div>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                <div class="bg-white rounded-xl shadow-sm overflow-hidden border border-gray-100 hover:shadow-md transition">
+                    <div class="h-48 bg-gray-200 relative">
+                        <span class="absolute top-3 left-3 bg-emerald-600 text-white text-xs font-bold px-2 py-1 rounded">प्राकृतिक (रामसार)</span>
+                    </div>
+                    <div class="p-5">
+                        <h3 class="text-lg font-bold text-gray-900 mb-1">विश्व प्रसिद्ध घोडाघोडी ताल</h3>
+                        <p class="text-xs text-gray-500 mb-3 flex items-center gap-1"><i class="fa-solid fa-location-dot text-amber-500"></i> वडा नं. १, सुखड नजिक</p>
+                        <p class="text-sm text-gray-600 line-clamp-3 mb-4">यो ताल क्षेत्र दुर्लभ चराचुरुङ्गी, गोही र जलचरहरूको प्रमुख बासस्थान हो। बर्ड वाचिङ र डुङ्गा सयरका लागि प्रख्यात छ।</p>
+                        <div class="flex justify-between items-center pt-3 border-t border-gray-100 text-xs text-gray-500">
+                            <span><i class="fa-regular fa-clock"></i> बाह्रै महिना</span>
+                            <span class="text-emerald-700 font-semibold">क्युआर उपलब्ध <i class="fa-solid fa-qrcode"></i></span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="bg-white rounded-xl shadow-sm overflow-hidden border border-gray-100 hover:shadow-md transition">
+                    <div class="h-48 bg-gray-200 relative">
+                        <span class="absolute top-3 left-3 bg-amber-600 text-white text-xs font-bold px-2 py-1 rounded">धार्मिक</span>
+                    </div>
+                    <div class="p-5">
+                        <h3 class="text-lg font-bold text-gray-900 mb-1">घोडाघोडी मन्दिर क्षेत्र</h3>
+                        <p class="text-xs text-gray-500 mb-3 flex items-center gap-1"><i class="fa-solid fa-location-dot text-amber-500"></i> वडा नं. ४</p>
+                        <p class="text-sm text-gray-600 line-clamp-3 mb-4">परम्परागत धार्मिक आस्थाको केन्द्र, जहाँ शिवरात्रि र मार्गशीर्ष पूर्णिमामा ठुलो मेला लाग्ने गर्दछ।</p>
+                        <div class="flex justify-between items-center pt-3 border-t border-gray-100 text-xs text-gray-500">
+                            <span><i class="fa-regular fa-clock"></i> मुख्य मेला: माघे संक्रान्ति</span>
+                            <span class="text-emerald-700 font-semibold">क्युआर उपलब्ध <i class="fa-solid fa-qrcode"></i></span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="bg-white rounded-xl shadow-sm overflow-hidden border border-gray-100 hover:shadow-md transition">
+                    <div class="h-48 bg-gray-200 relative">
+                        <span class="absolute top-3 left-3 bg-purple-600 text-white text-xs font-bold px-2 py-1 rounded">सांस्कृतिक</span>
+                    </div>
+                    <div class="p-5">
+                        <h3 class="text-lg font-bold text-gray-900 mb-1">माघी होमस्टे गाउँ (Tharu Village)</h3>
+                        <p class="text-xs text-gray-500 mb-3 flex items-center gap-1"><i class="fa-solid fa-location-dot text-amber-500"></i> वडा नं. ३</p>
+                        <p class="text-sm text-gray-600 line-clamp-3 mb-4">रैथाने थारु कला, सखिया नाच, ढिक्री र घोंघी जस्ता परम्परागत खाद्यान्नको स्वाद लिन सकिने उत्कृष्ट गन्तव्य।</p>
+                        <div class="flex justify-between items-center pt-3 border-t border-gray-100 text-xs text-gray-500">
+                            <span><i class="fa-regular fa-clock"></i> असोज - फागुन</span>
+                            <span class="text-emerald-700 font-semibold">क्युआर उपलब्ध <i class="fa-solid fa-qrcode"></i></span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section id="hotels" class="mb-16">
+            <div class="mb-6">
+                <h2 class="text-2xl font-bold text-emerald-950 flex items-center gap-2">
+                    <i class="fa-solid fa-bed text-amber-500"></i> होटल तथा होमस्टे सूची (Kobo Verified)
+                </h2>
+                <p class="text-sm text-gray-500 mt-1">स्थलगत प्राविधिकहरूबाट प्रमाणित आवासहरूको विवरण</p>
+            </div>
+            
+            <div class="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden">
+                <div class="overflow-x-auto">
+                    <table class="w-full text-left border-collapse text-sm">
+                        <thead>
+                            <tr class="bg-emerald-900 text-white text-xs font-semibold uppercase">
+                                <th class="p-4">आवासको नाम</th>
+                                <th class="p-4">प्रकार</th>
+                                <th class="p-4">स्थान/वडा</th>
+                                <th class="p-4">बेड क्षमता</th>
+                                <th class="p-4">सम्पर्क / स्थिति</th>
+                            </tr>
+                        </thead>
+                        <tbody class="divide-y divide-gray-100">
+                            <tr class="hover:bg-gray-50">
+                                <td class="p-4 font-bold text-gray-900">सामुदायिक थारु होमस्टे</td>
+                                <td class="p-4 text-purple-700 font-semibold">होमस्टे</td>
+                                <td class="p-4 text-gray-600">वडा नं. ३, माघी</td>
+                                <td class="p-4 font-semibold">४० बेड</td>
+                                <td class="p-4"><span class="bg-green-100 text-green-800 text-xs px-2.5 py-1 rounded-full font-bold">खुला छ</span></td>
+                            </tr>
+                            <tr class="hover:bg-gray-50">
+                                <td class="p-4 font-bold text-gray-900">घोडाघोडी इको रिसोर्ट</td>
+                                <td class="p-4 text-emerald-700 font-semibold">रिसोर्ट</td>
+                                <td class="p-4 text-gray-600">वडा नं. १, सुखड</td>
+                                <td class="p-4 font-semibold">५० बेड</td>
+                                <td class="p-4"><span class="bg-green-100 text-green-800 text-xs px-2.5 py-1 rounded-full font-bold">खुला छ</span></td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </section>
+
+        <section id="qr-section" class="bg-gradient-to-r hover:from-emerald-900 hover:to-teal-950 from-emerald-950 to-emerald-900 text-white p-8 rounded-2xl shadow-xl flex flex-col md:flex-row justify-between items-center gap-6">
+            <div class="max-w-xl text-center md:text-left">
+                <h2 class="text-2xl font-bold text-amber-400 mb-2">स्मार्ट क्युआर गाइड प्रणाली</h2>
+                <p class="text-sm opacity-90 leading-relaxed">
+                    Kobo Server मार्फत संकलन भएको डाटालाई प्रत्येक पर्यटकीय क्षेत्रमा क्युआर कोडको रूपमा राखिनेछ। पर्यटकले आफ्नो मोबाइलबाट स्क्यान गर्नासाथ सम्बन्धित स्थानको इतिहास, विशेषता, नक्सा र अडियो गाइड ३२ वटा भाषामा प्राप्त गर्न सक्नेछन्।
+                </p>
+            </div>
+            <div class="bg-white p-4 rounded-xl shadow-inner flex flex-col items-center shrink-0">
+                <div class="w-32 h-32 bg-gray-100 rounded-lg flex items-center justify-center border-2 border-dashed border-gray-300">
+                    <i class="fa-solid fa-qrcode text-6xl text-emerald-950"></i>
+                </div>
+                <span class="text-[10px] text-gray-500 font-bold mt-2 tracking-wide uppercase">Scan to Test Profile</span>
+            </div>
+        </section>
+
+    </main>
+
+    <footer class="bg-gray-900 text-gray-400 text-xs py-8 border-t border-gray-800 text-center">
+        <div class="container mx-auto px-4">
+            <p class="mb-2">&copy; २०२६ घोडाघोडी नगरपालिका - पर्यटन प्रवर्धन शाखा। सम्पूर्ण अधिकार सुरक्षित।</p>
+            <p>प्राविधिक सहजीकरण: <span class="text-amber-400">मोहरेन वेबसफ्ट प्रा. लि.</span></p>
+        </div>
+    </footer>
+
+</body>
+</html>
