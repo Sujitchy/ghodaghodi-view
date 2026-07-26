@@ -52,6 +52,71 @@ function ghodaghodi_body_classes($classes) {
 }
 add_filter('body_class', 'ghodaghodi_body_classes');
 
+function ghodaghodi_register_slider_post_type() {
+    register_post_type('ghodaghodi_slider', [
+        'labels' => [
+            'name'               => __('Hero Slider', 'ghodaghodi-view'),
+            'singular_name'      => __('Slide', 'ghodaghodi-view'),
+            'add_new'            => __('Add Slide', 'ghodaghodi-view'),
+            'add_new_item'       => __('Add New Slide', 'ghodaghodi-view'),
+            'edit_item'          => __('Edit Slide', 'ghodaghodi-view'),
+            'new_item'           => __('New Slide', 'ghodaghodi-view'),
+            'view_item'          => __('View Slide', 'ghodaghodi-view'),
+            'search_items'       => __('Search Slides', 'ghodaghodi-view'),
+            'not_found'          => __('No slides found', 'ghodaghodi-view'),
+            'not_found_in_trash' => __('No slides found in Trash', 'ghodaghodi-view'),
+        ],
+        'public'             => false,
+        'publicly_queryable' => false,
+        'show_ui'            => true,
+        'show_in_menu'       => true,
+        'menu_icon'          => 'dashicons-slides',
+        'supports'           => ['title', 'editor', 'thumbnail'],
+        'menu_position'      => 20,
+    ]);
+}
+add_action('init', 'ghodaghodi_register_slider_post_type');
+
+function ghodaghodi_slider_add_meta_boxes() {
+    add_meta_box('ghodaghodi_slide_options', __('Slide Options', 'ghodaghodi-view'), 'ghodaghodi_slide_meta_callback', 'ghodaghodi_slider', 'normal', 'high');
+}
+add_action('add_meta_boxes', 'ghodaghodi_slider_add_meta_boxes');
+
+function ghodaghodi_slide_meta_callback($post) {
+    wp_nonce_field('ghodaghodi_slide_meta', 'ghodaghodi_slide_meta_nonce');
+    $badge = get_post_meta($post->ID, '_slide_badge', true);
+    $button_text = get_post_meta($post->ID, '_slide_button_text', true);
+    $button_url = get_post_meta($post->ID, '_slide_button_url', true);
+?>
+    <p>
+        <label for="slide_badge"><?php _e('Badge Text (e.g. विश्व रामसार क्षेत्र):', 'ghodaghodi-view'); ?></label>
+        <input type="text" id="slide_badge" name="slide_badge" value="<?php echo esc_attr($badge); ?>" style="width:100%;" />
+    </p>
+    <p>
+        <label for="slide_button_text"><?php _e('Button Text (optional):', 'ghodaghodi-view'); ?></label>
+        <input type="text" id="slide_button_text" name="slide_button_text" value="<?php echo esc_attr($button_text); ?>" style="width:100%;" />
+    </p>
+    <p>
+        <label for="slide_button_url"><?php _e('Button URL (optional):', 'ghodaghodi-view'); ?></label>
+        <input type="text" id="slide_button_url" name="slide_button_url" value="<?php echo esc_attr($button_url); ?>" style="width:100%;" />
+    </p>
+<?php
+}
+
+function ghodaghodi_slider_save_meta($post_id) {
+    if (!isset($_POST['ghodaghodi_slide_meta_nonce']) || !wp_verify_nonce($_POST['ghodaghodi_slide_meta_nonce'], 'ghodaghodi_slide_meta')) return;
+    if (defined('DOING_AUTOSAVE') && DOING_AUTOSAVE) return;
+    if (!current_user_can('edit_post', $post_id)) return;
+
+    $fields = ['slide_badge', 'slide_button_text', 'slide_button_url'];
+    foreach ($fields as $field) {
+        if (isset($_POST[$field])) {
+            update_post_meta($post_id, '_' . $field, sanitize_text_field($_POST[$field]));
+        }
+    }
+}
+add_action('save_post_ghodaghodi_slider', 'ghodaghodi_slider_save_meta');
+
 require_once get_template_directory() . '/inc/template-tags.php';
 require_once get_template_directory() . '/inc/walker.php';
 require_once get_template_directory() . '/inc/customizer.php';

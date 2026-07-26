@@ -7,3 +7,38 @@
 body {
     font-family: 'Mukta', sans-serif;
 }
+
+.hero-slides-wrapper {
+    position: relative;
+    min-height: 300px;
+}
+
+.hero-slide {
+    position: absolute;
+    inset: 0;
+    opacity: 0;
+    transition: opacity 0.8s ease-in-out;
+    pointer-events: none;
+}
+
+.hero-slide.active {
+    position: relative;
+    opacity: 1;
+    pointer-events: auto;
+}
+
+.hero-slider-dot {
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.4);
+    border: 2px solid rgba(255, 255, 255, 0.6);
+    cursor: pointer;
+    transition: all 0.3s ease;
+    padding: 0;
+}
+
+.hero-slider-dot.active {
+    background: #f59e0b;
+    border-color: #f59e0b;
+}
