@@ -9,13 +9,17 @@
 
 <?php wp_body_open(); ?>
 
-<header class="bg-emerald-900 text-white sticky top-0 z-50 shadow-md">
-    <div class="container mx-auto px-4 py-3 flex justify-between items-center">
+<header id="header" class="site-header text-white">
+    <div class="container mx-auto px-4 flex justify-between items-center">
         <div class="flex items-center space-x-3">
-            <i class="fa-solid fa-tree-city text-2xl text-amber-400"></i>
-            <span class="text-xl font-bold tracking-wide">
-                <?php bloginfo('name'); ?>
-            </span>
+            <?php if (has_custom_logo()): ?>
+                <?php the_custom_logo(); ?>
+            <?php else: ?>
+                <a href="<?php echo esc_url(home_url('/')); ?>" class="logo">
+                    <i class="fa-solid fa-tree-city text-amber-400"></i>
+                    <span><?php bloginfo('name'); ?></span>
+                </a>
+            <?php endif; ?>
         </div>
 
         <button id="mobile-menu-toggle" class="md:hidden text-white focus:outline-none" aria-label="Toggle menu">
@@ -36,11 +40,11 @@
                 ]);
             } else {
                 ?>
-                <ul class="flex flex-col md:flex-row md:space-x-6">
-                    <li><a href="#dashboard" class="block py-2 md:py-0 hover:text-amber-400 transition">ड्यासबोर्ड</a></li>
-                    <li><a href="#destinations" class="block py-2 md:py-0 hover:text-amber-400 transition">गन्तव्यहरू</a></li>
-                    <li><a href="#hotels" class="block py-2 md:py-0 hover:text-amber-400 transition">होटल तथा होमस्टे</a></li>
-                    <li><a href="#qr-section" class="block py-2 md:py-0 hover:text-amber-400 transition">डिजिटल क्युआर</a></li>
+<ul class="flex flex-col md:flex-row md:space-x-6">
+                    <li><a href="#dashboard" class="block py-2 md:py-0 hover:text-[#FFD700] transition">ड्यासबोर्ड</a></li>
+                    <li><a href="#destinations" class="block py-2 md:py-0 hover:text-[#FFD700] transition">गन्तव्यहरू</a></li>
+                    <li><a href="#hotels" class="block py-2 md:py-0 hover:text-[#FFD700] transition">होटल तथा होमस्टे</a></li>
+                    <li><a href="#qr-section" class="block py-2 md:py-0 hover:text-[#FFD700] transition">डिजिटल क्युआर</a></li>
                 </ul>
                 <?php
             }

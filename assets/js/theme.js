@@ -10,4 +10,13 @@ document.addEventListener('DOMContentLoaded', function () {
             mobileMenu.classList.toggle('hidden');
         });
     }
+
+    var header = document.getElementById('header');
+    if (header) {
+        var onScroll = function () {
+            header.classList.toggle('scrolled', window.scrollY > 80);
+        };
+        onScroll();
+        window.addEventListener('scroll', onScroll, { passive: true });
+    }
 });
