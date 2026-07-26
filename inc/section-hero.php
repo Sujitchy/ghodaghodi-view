@@ -21,7 +21,7 @@
         ?>
         <div class="hero-slide <?php echo $active_class; ?>" data-index="<?php echo $i; ?>">
             <div class="absolute inset-0 bg-cover bg-center opacity-20" style="background-image: url('<?php echo esc_url($bg_url ?: get_theme_mod('ghodaghodi_hero_bg', 'https://images.unsplash.com/photo-1507525428034-b723cf961d3e?auto=format&fit=crop&w=1200&q=80')); ?>');"></div>
-            <div class="relative container mx-auto max-w-3xl px-4 py-20 md:py-28 text-center">
+            <div class="relative container mx-auto max-w-3xl px-4 py-28 md:py-40 text-center">
                 <?php if ($badge): ?>
                 <span class="bg-amber-500 text-emerald-950 text-xs font-bold px-3 py-1 rounded-full uppercase tracking-wider">
                     <?php echo esc_html($badge); ?>
@@ -67,6 +67,5 @@
         </div>
     </div>
     <?php endif; ?>
->
     </div>
 </section>

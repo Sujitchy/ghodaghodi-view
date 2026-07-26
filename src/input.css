@@ -10,7 +10,7 @@ body {
 
 .hero-slides-wrapper {
     position: relative;
-    min-height: 300px;
+    min-height: 500px;
 }
 
 .hero-slide {
@@ -41,4 +41,49 @@ body {
 .hero-slider-dot.active {
     background: #f59e0b;
     border-color: #f59e0b;
+}
+
+.site-header {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    z-index: 9999;
+    background: transparent;
+    padding: 20px 0;
+    transition: all 0.4s ease;
+}
+
+.site-header .container {
+    padding-top: 0;
+    padding-bottom: 0;
+}
+
+.site-header.scrolled {
+    background: rgba(6, 78, 59, 0.95);
+    -webkit-backdrop-filter: blur(12px);
+    backdrop-filter: blur(12px);
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
+    padding: 14px 0;
+}
+
+.site-header nav ul li a {
+    color: #fff;
+    font-size: 17px;
+    text-decoration: none;
+    transition: color 0.3s ease;
+}
+
+.site-header nav ul li a:hover {
+    color: #FFD700;
+}
+
+.logo {
+    color: #fff;
+    font-size: 28px;
+    font-weight: 700;
+}
+
+.logo:hover {
+    color: #FFD700;
 }
