@@ -117,6 +117,171 @@ function ghodaghodi_slider_save_meta($post_id) {
 }
 add_action('save_post_ghodaghodi_slider', 'ghodaghodi_slider_save_meta');
 
+function ghodaghodi_register_hotel_post_type() {
+    register_post_type('ghodaghodi_hotel', [
+        'labels' => [
+            'name'               => __('Hotels & Homestays', 'ghodaghodi-view'),
+            'singular_name'      => __('Hotel & Homestay', 'ghodaghodi-view'),
+            'add_new'            => __('Add New', 'ghodaghodi-view'),
+            'add_new_item'       => __('Add New Hotel & Homestay', 'ghodaghodi-view'),
+            'edit_item'          => __('Edit Hotel & Homestay', 'ghodaghodi-view'),
+            'new_item'           => __('New Hotel & Homestay', 'ghodaghodi-view'),
+            'view_item'          => __('View Hotel & Homestay', 'ghodaghodi-view'),
+            'search_items'       => __('Search Hotels & Homestays', 'ghodaghodi-view'),
+            'not_found'          => __('No hotels or homestays found', 'ghodaghodi-view'),
+            'not_found_in_trash' => __('No hotels or homestays found in Trash', 'ghodaghodi-view'),
+            'all_items'          => __('All Hotels & Homestays', 'ghodaghodi-view'),
+            'menu_name'          => __('Hotels & Homestays', 'ghodaghodi-view'),
+        ],
+        'public'             => true,
+        'publicly_queryable' => true,
+        'show_ui'            => true,
+        'show_in_menu'       => true,
+        'menu_icon'          => 'dashicons-building',
+        'menu_position'      => 21,
+        'supports'           => ['title', 'editor', 'thumbnail', 'excerpt'],
+        'has_archive'        => true,
+        'rewrite'            => ['slug' => 'hotel', 'with_front' => false],
+        'show_in_rest'       => false,
+    ]);
+}
+add_action('init', 'ghodaghodi_register_hotel_post_type');
+
+add_filter('use_block_editor_for_post_type', function ($enabled, $post_type) {
+    if ('ghodaghodi_hotel' === $post_type) {
+        return false;
+    }
+    return $enabled;
+}, 10, 2);
+
+function ghodaghodi_hotel_add_meta_boxes() {
+    add_meta_box('ghodaghodi_hotel_details', __('Hotel Details', 'ghodaghodi-view'), 'ghodaghodi_hotel_meta_callback', 'ghodaghodi_hotel', 'normal', 'high');
+}
+add_action('add_meta_boxes', 'ghodaghodi_hotel_add_meta_boxes');
+
+function ghodaghodi_hotel_meta_callback($post) {
+    wp_nonce_field('ghodaghodi_hotel_meta', 'ghodaghodi_hotel_meta_nonce');
+    $type     = get_post_meta($post->ID, '_hotel_type', true);
+    $location = get_post_meta($post->ID, '_hotel_location', true);
+    $beds     = get_post_meta($post->ID, '_hotel_beds', true);
+    $status   = get_post_meta($post->ID, '_hotel_status', true);
+    $contact  = get_post_meta($post->ID, '_hotel_contact', true);
+?>
+    <style>
+        #ghodaghodi_hotel_details .form-table select#hotel_status {
+            min-width: 200px;
+            padding: 4px 8px;
+            font-weight: 600;
+        }
+        #ghodaghodi_hotel_details .form-table select#hotel_status option[value="open"] {
+            background-color: #d1fae5;
+            color: #065f46;
+        }
+        #ghodaghodi_hotel_details .form-table select#hotel_status option[value="closed"] {
+            background-color: #fee2e2;
+            color: #991b1b;
+        }
+        #ghodaghodi_hotel_details .form-table select#hotel_status option[value="temporarily_closed"] {
+            background-color: #fef3c7;
+            color: #b45309;
+        }
+        #ghodaghodi_hotel_details .form-table select#hotel_status optgroup,
+        #ghodaghodi_hotel_details .form-table select#hotel_status option {
+            padding: 6px 10px;
+        }
+        #ghodaghodi_hotel_details .form-table select#hotel_status.has-open {
+            background-color: #d1fae5;
+            color: #065f46;
+            border-color: #6ee7b7;
+        }
+        #ghodaghodi_hotel_details .form-table select#hotel_status.has-closed {
+            background-color: #fee2e2;
+            color: #991b1b;
+            border-color: #fca5a5;
+        }
+    </style>
+    <script>
+    jQuery(function($) {
+        var $sel = $('#hotel_status');
+        function updateStatusStyle() {
+            $sel.removeClass('has-open has-closed').addClass('has-' + $sel.val());
+        }
+        updateStatusStyle();
+        $sel.on('change', updateStatusStyle);
+    });
+    </script>
+    <table class="form-table">
+        <tr>
+            <th scope="row">
+                <label for="hotel_type"><?php _e('Type', 'ghodaghodi-view'); ?></label>
+            </th>
+            <td>
+                <input type="text" id="hotel_type" name="hotel_type" value="<?php echo esc_attr($type); ?>" class="regular-text" placeholder="<?php _e('E.g.: Homestay, Hotel, Resort', 'ghodaghodi-view'); ?>" />
+                <p class="description"><?php _e('Specify the type of accommodation', 'ghodaghodi-view'); ?></p>
+            </td>
+        </tr>
+        <tr>
+            <th scope="row">
+                <label for="hotel_location"><?php _e('Location/VDC', 'ghodaghodi-view'); ?></label>
+            </th>
+            <td>
+                <input type="text" id="hotel_location" name="hotel_location" value="<?php echo esc_attr($location); ?>" class="regular-text" placeholder="<?php _e('E.g.: VDC No. 5', 'ghodaghodi-view'); ?>" />
+                <p class="description"><?php _e('The location or VDC where the accommodation is located', 'ghodaghodi-view'); ?></p>
+            </td>
+        </tr>
+        <tr>
+            <th scope="row">
+                <label for="hotel_beds"><?php _e('Beds Capacity', 'ghodaghodi-view'); ?></label>
+            </th>
+            <td>
+                <input type="text" id="hotel_beds" name="hotel_beds" value="<?php echo esc_attr($beds); ?>" class="regular-text" placeholder="<?php _e('E.g.: 15 people', 'ghodaghodi-view'); ?>" />
+                <p class="description"><?php _e('Total number of beds available', 'ghodaghodi-view'); ?></p>
+            </td>
+        </tr>
+        <tr>
+            <th scope="row">
+                <label for="hotel_contact"><?php _e('Contact Number', 'ghodaghodi-view'); ?></label>
+            </th>
+            <td>
+                <input type="text" id="hotel_contact" name="hotel_contact" value="<?php echo esc_attr($contact); ?>" class="regular-text" placeholder="<?php _e('E.g.: 9841234567', 'ghodaghodi-view'); ?>" />
+                <p class="description"><?php _e('Phone number for contact', 'ghodaghodi-view'); ?></p>
+            </td>
+        </tr>
+        <tr>
+            <th scope="row">
+                <label for="hotel_status"><?php _e('Status', 'ghodaghodi-view'); ?></label>
+            </th>
+            <td>
+                <select id="hotel_status" name="hotel_status">
+                    <option value="open" <?php selected($status, 'open'); ?>><?php _e('Open', 'ghodaghodi-view'); ?></option>
+                    <option value="temporarily_closed" <?php selected($status, 'temporarily_closed'); ?>><?php _e('Temporarily Closed', 'ghodaghodi-view'); ?></option>
+                    <option value="closed" <?php selected($status, 'closed'); ?>><?php _e('Closed', 'ghodaghodi-view'); ?></option>
+                </select>
+                <p class="description"><?php _e('Whether the accommodation is currently operating or not', 'ghodaghodi-view'); ?></p>
+            </td>
+        </tr>
+    </table>
+<?php
+}
+
+function ghodaghodi_hotel_save_meta($post_id) {
+    if (!isset($_POST['ghodaghodi_hotel_meta_nonce']) || !wp_verify_nonce($_POST['ghodaghodi_hotel_meta_nonce'], 'ghodaghodi_hotel_meta')) return;
+    if (defined('DOING_AUTOSAVE') && DOING_AUTOSAVE) return;
+    if (!current_user_can('edit_post', $post_id)) return;
+
+    $fields = ['hotel_type', 'hotel_location', 'hotel_beds', 'hotel_contact'];
+    foreach ($fields as $field) {
+        if (isset($_POST[$field])) {
+            update_post_meta($post_id, '_' . $field, sanitize_text_field($_POST[$field]));
+        }
+    }
+
+    if (isset($_POST['hotel_status']) && in_array($_POST['hotel_status'], ['open', 'closed', 'temporarily_closed'])) {
+        update_post_meta($post_id, '_hotel_status', $_POST['hotel_status']);
+    }
+}
+add_action('save_post_ghodaghodi_hotel', 'ghodaghodi_hotel_save_meta');
+
 require_once get_template_directory() . '/inc/template-tags.php';
 require_once get_template_directory() . '/inc/walker.php';
 require_once get_template_directory() . '/inc/customizer.php';
