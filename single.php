@@ -6,13 +6,9 @@
         the_post();
     ?>
 
-        <?php if (has_post_thumbnail()): ?>
-            <div class="w-full h-[250px] sm:h-[400px] lg:h-[550px]">
-                <?php the_post_thumbnail('full', ['class' => 'w-full h-full object-cover', 'alt' => get_the_title()]); ?>
-            </div>
-        <?php endif; ?>
+        <?php get_template_part('template-parts/featured-hero'); ?>
 
-        <div class="w-full px-4 mx-auto py-12">
+        <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-10">
             <article id="post-<?php the_ID(); ?>" <?php post_class('bg-white rounded-xl shadow-sm border border-gray-100'); ?>>
 
             <div class="p-6 md:p-10">
