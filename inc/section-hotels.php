@@ -14,7 +14,7 @@
                     <tr class="bg-emerald-900 text-white text-xs font-semibold uppercase">
                         <th class="gh-col-name"><?php _e('आवासको नाम', 'ghodaghodi-view'); ?></th>
                         <th class="gh-col-type"><?php _e('प्रकार', 'ghodaghodi-view'); ?></th>
-                        <th class="gh-col-location"><?php _e('स्थान/वडा', 'ghodaghodi-view'); ?></th>
+                        <th class="gh-col-location"><?php _e('स्थान', 'ghodaghodi-view'); ?></th>
                         <th class="gh-col-beds"><?php _e('बेड क्षमता', 'ghodaghodi-view'); ?></th>
                         <th class="gh-col-contact"><?php _e('सम्पर्क / स्थिति', 'ghodaghodi-view'); ?></th>
                     </tr>

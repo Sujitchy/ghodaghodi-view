@@ -4,13 +4,13 @@
     <?php
     while (have_posts()):
         the_post();
-        ?>
+    ?>
         <article id="post-<?php the_ID(); ?>" <?php post_class('bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden'); ?>>
 
             <?php if (has_post_thumbnail()): ?>
-            <div class="h-64 md:h-96 overflow-hidden">
-                <?php the_post_thumbnail('full', ['class' => 'w-full h-full object-cover', 'alt' => get_the_title()]); ?>
-            </div>
+                <div class="h-64 md:h-96 overflow-hidden">
+                    <?php the_post_thumbnail('full', ['class' => 'w-full h-full object-cover', 'alt' => get_the_title()]); ?>
+                </div>
             <?php endif; ?>
 
             <div class="p-6 md:p-10">
@@ -46,21 +46,7 @@
             </div>
         </article>
 
-        <nav class="flex justify-between mt-8">
-            <div class="text-sm">
-                <?php previous_post_link('%link', '<i class="fa-solid fa-arrow-left"></i> %title'); ?>
-            </div>
-            <div class="text-sm">
-                <?php next_post_link('%link', '%title <i class="fa-solid fa-arrow-right"></i>'); ?>
-            </div>
-        </nav>
-
-        <?php
-        if (comments_open() || get_comments_number()):
-            comments_template();
-        endif;
-    endwhile;
-    ?>
+    <?php endwhile; ?>
 </main>
 
 <?php get_footer(); ?>

@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Ghodaghodi View Theme Functions
  */
@@ -6,7 +7,8 @@
 define('GHODAGHODI_VERSION', '1.0.0');
 
 if (!function_exists('ghodaghodi_setup')):
-    function ghodaghodi_setup() {
+    function ghodaghodi_setup()
+    {
         load_theme_textdomain('ghodaghodi-view', get_template_directory() . '/languages');
 
         add_theme_support('title-tag');
@@ -29,7 +31,8 @@ if (!function_exists('ghodaghodi_setup')):
 endif;
 add_action('after_setup_theme', 'ghodaghodi_setup');
 
-function ghodaghodi_scripts() {
+function ghodaghodi_scripts()
+{
     $theme = wp_get_theme();
 
     wp_enqueue_style('ghodaghodi-tailwind', get_template_directory_uri() . '/assets/css/style.css', [], $theme->get('Version'));
@@ -44,7 +47,8 @@ function ghodaghodi_scripts() {
 }
 add_action('wp_enqueue_scripts', 'ghodaghodi_scripts');
 
-function ghodaghodi_body_classes($classes) {
+function ghodaghodi_body_classes($classes)
+{
     if (is_front_page()) {
         $classes[] = 'font-mukta bg-gray-50 text-gray-800';
     }
@@ -52,7 +56,8 @@ function ghodaghodi_body_classes($classes) {
 }
 add_filter('body_class', 'ghodaghodi_body_classes');
 
-function ghodaghodi_register_slider_post_type() {
+function ghodaghodi_register_slider_post_type()
+{
     register_post_type('ghodaghodi_slider', [
         'labels' => [
             'name'               => __('Hero Slider', 'ghodaghodi-view'),
@@ -77,12 +82,14 @@ function ghodaghodi_register_slider_post_type() {
 }
 add_action('init', 'ghodaghodi_register_slider_post_type');
 
-function ghodaghodi_slider_add_meta_boxes() {
+function ghodaghodi_slider_add_meta_boxes()
+{
     add_meta_box('ghodaghodi_slide_options', __('Slide Options', 'ghodaghodi-view'), 'ghodaghodi_slide_meta_callback', 'ghodaghodi_slider', 'normal', 'high');
 }
 add_action('add_meta_boxes', 'ghodaghodi_slider_add_meta_boxes');
 
-function ghodaghodi_slide_meta_callback($post) {
+function ghodaghodi_slide_meta_callback($post)
+{
     wp_nonce_field('ghodaghodi_slide_meta', 'ghodaghodi_slide_meta_nonce');
     $badge = get_post_meta($post->ID, '_slide_badge', true);
     $button_text = get_post_meta($post->ID, '_slide_button_text', true);
@@ -103,7 +110,8 @@ function ghodaghodi_slide_meta_callback($post) {
 <?php
 }
 
-function ghodaghodi_slider_save_meta($post_id) {
+function ghodaghodi_slider_save_meta($post_id)
+{
     if (!isset($_POST['ghodaghodi_slide_meta_nonce']) || !wp_verify_nonce($_POST['ghodaghodi_slide_meta_nonce'], 'ghodaghodi_slide_meta')) return;
     if (defined('DOING_AUTOSAVE') && DOING_AUTOSAVE) return;
     if (!current_user_can('edit_post', $post_id)) return;
@@ -117,7 +125,8 @@ function ghodaghodi_slider_save_meta($post_id) {
 }
 add_action('save_post_ghodaghodi_slider', 'ghodaghodi_slider_save_meta');
 
-function ghodaghodi_register_hotel_post_type() {
+function ghodaghodi_register_hotel_post_type()
+{
     register_post_type('ghodaghodi_hotel', [
         'labels' => [
             'name'               => __('Hotels & Homestays', 'ghodaghodi-view'),
@@ -154,12 +163,14 @@ add_filter('use_block_editor_for_post_type', function ($enabled, $post_type) {
     return $enabled;
 }, 10, 2);
 
-function ghodaghodi_hotel_add_meta_boxes() {
+function ghodaghodi_hotel_add_meta_boxes()
+{
     add_meta_box('ghodaghodi_hotel_details', __('Hotel Details', 'ghodaghodi-view'), 'ghodaghodi_hotel_meta_callback', 'ghodaghodi_hotel', 'normal', 'high');
 }
 add_action('add_meta_boxes', 'ghodaghodi_hotel_add_meta_boxes');
 
-function ghodaghodi_hotel_meta_callback($post) {
+function ghodaghodi_hotel_meta_callback($post)
+{
     wp_nonce_field('ghodaghodi_hotel_meta', 'ghodaghodi_hotel_meta_nonce');
     $type     = get_post_meta($post->ID, '_hotel_type', true);
     $location = get_post_meta($post->ID, '_hotel_location', true);
@@ -173,27 +184,33 @@ function ghodaghodi_hotel_meta_callback($post) {
             padding: 4px 8px;
             font-weight: 600;
         }
+
         #ghodaghodi_hotel_details .form-table select#hotel_status option[value="open"] {
             background-color: #d1fae5;
             color: #065f46;
         }
+
         #ghodaghodi_hotel_details .form-table select#hotel_status option[value="closed"] {
             background-color: #fee2e2;
             color: #991b1b;
         }
+
         #ghodaghodi_hotel_details .form-table select#hotel_status option[value="temporarily_closed"] {
             background-color: #fef3c7;
             color: #b45309;
         }
+
         #ghodaghodi_hotel_details .form-table select#hotel_status optgroup,
         #ghodaghodi_hotel_details .form-table select#hotel_status option {
             padding: 6px 10px;
         }
+
         #ghodaghodi_hotel_details .form-table select#hotel_status.has-open {
             background-color: #d1fae5;
             color: #065f46;
             border-color: #6ee7b7;
         }
+
         #ghodaghodi_hotel_details .form-table select#hotel_status.has-closed {
             background-color: #fee2e2;
             color: #991b1b;
@@ -201,14 +218,15 @@ function ghodaghodi_hotel_meta_callback($post) {
         }
     </style>
     <script>
-    jQuery(function($) {
-        var $sel = $('#hotel_status');
-        function updateStatusStyle() {
-            $sel.removeClass('has-open has-closed').addClass('has-' + $sel.val());
-        }
-        updateStatusStyle();
-        $sel.on('change', updateStatusStyle);
-    });
+        jQuery(function($) {
+            var $sel = $('#hotel_status');
+
+            function updateStatusStyle() {
+                $sel.removeClass('has-open has-closed').addClass('has-' + $sel.val());
+            }
+            updateStatusStyle();
+            $sel.on('change', updateStatusStyle);
+        });
     </script>
     <table class="form-table">
         <tr>
@@ -222,11 +240,11 @@ function ghodaghodi_hotel_meta_callback($post) {
         </tr>
         <tr>
             <th scope="row">
-                <label for="hotel_location"><?php _e('Location/VDC', 'ghodaghodi-view'); ?></label>
+                <label for="hotel_location"><?php _e('Location/Address', 'ghodaghodi-view'); ?></label>
             </th>
             <td>
-                <input type="text" id="hotel_location" name="hotel_location" value="<?php echo esc_attr($location); ?>" class="regular-text" placeholder="<?php _e('E.g.: VDC No. 5', 'ghodaghodi-view'); ?>" />
-                <p class="description"><?php _e('The location or VDC where the accommodation is located', 'ghodaghodi-view'); ?></p>
+                <input type="text" id="hotel_location" name="hotel_location" value="<?php echo esc_attr($location); ?>" class="regular-text" placeholder="<?php _e('E.g.: 123 Main Road, Ghodaghodi,  10001', 'ghodaghodi-view'); ?>" />
+                <p class="description"><?php _e('The location or address where the accommodation is located', 'ghodaghodi-view'); ?></p>
             </td>
         </tr>
         <tr>
@@ -264,7 +282,8 @@ function ghodaghodi_hotel_meta_callback($post) {
 <?php
 }
 
-function ghodaghodi_hotel_save_meta($post_id) {
+function ghodaghodi_hotel_save_meta($post_id)
+{
     if (!isset($_POST['ghodaghodi_hotel_meta_nonce']) || !wp_verify_nonce($_POST['ghodaghodi_hotel_meta_nonce'], 'ghodaghodi_hotel_meta')) return;
     if (defined('DOING_AUTOSAVE') && DOING_AUTOSAVE) return;
     if (!current_user_can('edit_post', $post_id)) return;
