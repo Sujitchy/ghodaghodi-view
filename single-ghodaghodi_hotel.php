@@ -1,6 +1,6 @@
 <?php get_header(); ?>
 
-<main class="container mx-auto px-4 py-12 max-w-4xl">
+<main class="w-full px-4 mx-auto py-12">
     <?php
     while (have_posts()):
         the_post();
