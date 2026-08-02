@@ -1,17 +1,19 @@
 <?php get_header(); ?>
 
-<main class="w-full px-4 mx-auto py-12">
+<main>
     <?php
     while (have_posts()):
         the_post();
     ?>
-        <article id="post-<?php the_ID(); ?>" <?php post_class('bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden'); ?>>
 
-            <?php if (has_post_thumbnail()): ?>
-                <div class="h-64 md:h-96 overflow-hidden">
-                    <?php the_post_thumbnail('full', ['class' => 'w-full h-full object-cover', 'alt' => get_the_title()]); ?>
-                </div>
-            <?php endif; ?>
+        <?php if (has_post_thumbnail()): ?>
+            <div class="w-full h-[250px] sm:h-[400px] lg:h-[550px]">
+                <?php the_post_thumbnail('full', ['class' => 'w-full h-full object-cover', 'alt' => get_the_title()]); ?>
+            </div>
+        <?php endif; ?>
+
+        <div class="w-full px-4 mx-auto py-12">
+            <article id="post-<?php the_ID(); ?>" <?php post_class('bg-white rounded-xl shadow-sm border border-gray-100'); ?>>
 
             <div class="p-6 md:p-10">
                 <div class="flex flex-wrap gap-2 mb-4">
@@ -45,6 +47,7 @@
                 </div>
             </div>
         </article>
+        </div>
 
     <?php endwhile; ?>
 </main>
