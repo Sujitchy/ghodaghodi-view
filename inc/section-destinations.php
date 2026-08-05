@@ -25,6 +25,9 @@
                 $location   = get_post_meta(get_the_ID(), '_destination_location', true);
                 $best_time  = get_post_meta(get_the_ID(), '_destination_best_time', true);
                 $season     = get_post_meta(get_the_ID(), '_destination_season', true);
+                $duration   = get_post_meta(get_the_ID(), '_destination_trek_duration', true);
+                $elevation  = get_post_meta(get_the_ID(), '_destination_trek_max_elevation', true);
+                $difficulty = (int) get_post_meta(get_the_ID(), '_destination_trek_difficulty', true);
         ?>
                 <div class="bg-white rounded-xl shadow-sm overflow-hidden border border-gray-100 hover:shadow-md transition">
                     <div class="h-48 bg-gray-200 relative overflow-hidden">
@@ -41,6 +44,28 @@
                             <p class="text-xs text-gray-500 mb-3 flex items-center gap-1">
                                 <i class="fa-solid fa-location-dot text-amber-500"></i> <?php echo esc_html($location); ?>
                             </p>
+                        <?php endif; ?>
+                        <?php if ($duration || $elevation || $difficulty): ?>
+                            <div class="flex flex-wrap items-center gap-2 mb-3">
+                                <?php if ($duration): ?>
+                                    <span class="inline-flex items-center gap-1.5 bg-emerald-50 text-emerald-700 text-xs font-semibold px-2.5 py-1 rounded-full">
+                                        <i class="fa-regular fa-clock"></i> <?php echo esc_html($duration); ?>
+                                    </span>
+                                <?php endif; ?>
+                                <?php if ($elevation): ?>
+                                    <span class="inline-flex items-center gap-1.5 bg-sky-50 text-sky-700 text-xs font-semibold px-2.5 py-1 rounded-full">
+                                        <i class="fa-solid fa-mountain-sun"></i> <?php echo esc_html($elevation); ?>
+                                    </span>
+                                <?php endif; ?>
+                                <?php if ($difficulty): ?>
+                                    <span class="inline-flex items-center gap-1 text-xs" title="<?php echo esc_attr(sprintf(__('Difficulty: %1$d / 5', 'ghodaghodi-view'), $difficulty)); ?>">
+                                        <span class="sr-only"><?php _e('Difficulty:', 'ghodaghodi-view'); ?></span>
+                                        <?php for ($i = 1; $i <= 5; $i++): ?>
+                                            <i class="<?php echo $i <= $difficulty ? 'fa-solid fa-star text-amber-400' : 'fa-regular fa-star text-gray-300'; ?>"></i>
+                                        <?php endfor; ?>
+                                    </span>
+                                <?php endif; ?>
+                            </div>
                         <?php endif; ?>
                         <p class="text-sm text-gray-600 line-clamp-3 mb-4">
                             <?php echo wp_trim_words(get_the_excerpt() ?: get_the_content(), 25); ?>
