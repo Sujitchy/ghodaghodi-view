@@ -301,6 +301,87 @@ function ghodaghodi_hotel_save_meta($post_id)
 }
 add_action('save_post_ghodaghodi_hotel', 'ghodaghodi_hotel_save_meta');
 
+function ghodaghodi_destination_add_meta_boxes()
+{
+    add_meta_box('ghodaghodi_destination_details', __('Destination Details', 'ghodaghodi-view'), 'ghodaghodi_destination_meta_callback', 'post', 'normal', 'high');
+}
+add_action('add_meta_boxes', 'ghodaghodi_destination_add_meta_boxes');
+
+function ghodaghodi_destination_meta_callback($post)
+{
+    wp_nonce_field('ghodaghodi_destination_meta', 'ghodaghodi_destination_meta_nonce');
+    $location  = get_post_meta($post->ID, '_destination_location', true);
+    $best_time = get_post_meta($post->ID, '_destination_best_time', true);
+    $season    = get_post_meta($post->ID, '_destination_season', true);
+
+    $seasons = [
+        'spring'   => __('Spring', 'ghodaghodi-view'),
+        'summer'   => __('Summer', 'ghodaghodi-view'),
+        'autumn'   => __('Autumn', 'ghodaghodi-view'),
+        'winter'   => __('Winter', 'ghodaghodi-view'),
+        'all_year' => __('All Year', 'ghodaghodi-view'),
+    ];
+?>
+    <table class="form-table">
+        <tr>
+            <th scope="row">
+                <label for="destination_location"><?php _e('Location', 'ghodaghodi-view'); ?></label>
+            </th>
+            <td>
+                <input type="text" id="destination_location" name="destination_location" value="<?php echo esc_attr($location); ?>" class="regular-text" placeholder="<?php _e('E.g.: Ghodaghodi Lake Area', 'ghodaghodi-view'); ?>" />
+                <p class="description"><?php _e('The location of the destination', 'ghodaghodi-view'); ?></p>
+            </td>
+        </tr>
+        <tr>
+            <th scope="row">
+                <label for="destination_best_time"><?php _e('Best Time to Visit', 'ghodaghodi-view'); ?></label>
+            </th>
+            <td>
+                <input type="text" id="destination_best_time" name="destination_best_time" value="<?php echo esc_attr($best_time); ?>" class="regular-text" placeholder="<?php _e('E.g.: Sept–Nov, Feb–Apr', 'ghodaghodi-view'); ?>" />
+                <p class="description"><?php _e('Recommended time of year to visit', 'ghodaghodi-view'); ?></p>
+            </td>
+        </tr>
+        <tr>
+            <th scope="row">
+                <label for="destination_season"><?php _e('Recommended Season', 'ghodaghodi-view'); ?></label>
+            </th>
+            <td>
+                <select id="destination_season" name="destination_season">
+                    <option value=""><?php _e('— Select Season —', 'ghodaghodi-view'); ?></option>
+                    <?php foreach ($seasons as $value => $label): ?>
+                        <option value="<?php echo esc_attr($value); ?>" <?php selected($season, $value); ?>><?php echo esc_html($label); ?></option>
+                    <?php endforeach; ?>
+                </select>
+                <p class="description"><?php _e('The season recommended for visiting this destination', 'ghodaghodi-view'); ?></p>
+            </td>
+        </tr>
+    </table>
+<?php
+}
+
+function ghodaghodi_destination_save_meta($post_id)
+{
+    if (!isset($_POST['ghodaghodi_destination_meta_nonce']) || !wp_verify_nonce($_POST['ghodaghodi_destination_meta_nonce'], 'ghodaghodi_destination_meta')) return;
+    if (defined('DOING_AUTOSAVE') && DOING_AUTOSAVE) return;
+    if (!current_user_can('edit_post', $post_id)) return;
+    if ('post' !== get_post_type($post_id)) return;
+
+    $fields = ['destination_location', 'destination_best_time'];
+    foreach ($fields as $field) {
+        if (isset($_POST[$field])) {
+            update_post_meta($post_id, '_' . $field, sanitize_text_field($_POST[$field]));
+        }
+    }
+
+    $seasons = ['spring', 'summer', 'autumn', 'winter', 'all_year'];
+    if (isset($_POST['destination_season']) && in_array($_POST['destination_season'], $seasons, true)) {
+        update_post_meta($post_id, '_destination_season', sanitize_text_field($_POST['destination_season']));
+    } else {
+        delete_post_meta($post_id, '_destination_season');
+    }
+}
+add_action('save_post', 'ghodaghodi_destination_save_meta');
+
 require_once get_template_directory() . '/inc/template-tags.php';
 require_once get_template_directory() . '/inc/walker.php';
 require_once get_template_directory() . '/inc/customizer.php';

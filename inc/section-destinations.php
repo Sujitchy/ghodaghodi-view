@@ -24,6 +24,7 @@
                 $cat_name   = !empty($categories) ? $categories[0]->name : __('सामान्य', 'ghodaghodi-view');
                 $location   = get_post_meta(get_the_ID(), '_destination_location', true);
                 $best_time  = get_post_meta(get_the_ID(), '_destination_best_time', true);
+                $season     = get_post_meta(get_the_ID(), '_destination_season', true);
         ?>
                 <div class="bg-white rounded-xl shadow-sm overflow-hidden border border-gray-100 hover:shadow-md transition">
                     <div class="h-48 bg-gray-200 relative overflow-hidden">
@@ -45,7 +46,12 @@
                             <?php echo wp_trim_words(get_the_excerpt() ?: get_the_content(), 25); ?>
                         </p>
                         <div class="flex justify-between items-center pt-3 border-t border-gray-100 text-xs text-gray-500">
-                            <span><i class="fa-regular fa-clock"></i> <?php echo $best_time ? esc_html($best_time) : __('बाह्रै महिना', 'ghodaghodi-view'); ?></span>
+                            <div class="flex flex-wrap items-center gap-3">
+                                <?php if ($season): ?>
+                                    <span><i class="fa-solid fa-calendar-days text-amber-500"></i> <?php echo esc_html($season); ?></span>
+                                <?php endif; ?>
+                                <span><i class="fa-regular fa-clock"></i> <?php echo $best_time ? esc_html($best_time) : __('बाह्रै महिना', 'ghodaghodi-view'); ?></span>
+                            </div>
                             <a href="<?php the_permalink(); ?>" class="text-emerald-700 font-semibold hover:text-amber-600 transition">
                                 <?php _e('विस्तृतमा हेर्नुहोस्', 'ghodaghodi-view'); ?> <i class="fa-solid fa-arrow-right"></i>
                             </a>

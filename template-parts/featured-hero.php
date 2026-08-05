@@ -1,11 +1,4 @@
 <?php
-/**
- * Featured image hero banner.
- *
- * Renders the post thumbnail as a full-width, responsive hero banner
- * directly below the site header with a subtle dark gradient overlay.
- * The post content is kept in a separate, centered container.
- */
 if (!has_post_thumbnail()) {
     return;
 }
