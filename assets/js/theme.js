@@ -67,6 +67,50 @@ document.addEventListener('DOMContentLoaded', function () {
 });
 
 document.addEventListener('DOMContentLoaded', function () {
+    var triggers = document.querySelectorAll('[data-ghodaghodi-lightbox]');
+    if (!triggers.length) return;
+
+    var overlay = document.createElement('div');
+    overlay.className = 'ghodaghodi-lightbox-overlay';
+    overlay.setAttribute('role', 'dialog');
+    overlay.setAttribute('aria-modal', 'true');
+    overlay.innerHTML =
+        '<button type="button" class="ghodaghodi-lightbox-close" aria-label="Close"><i class="fa-solid fa-xmark"></i></button>' +
+        '<div class="ghodaghodi-lightbox-content"></div>';
+    document.body.appendChild(overlay);
+
+    var content = overlay.querySelector('.ghodaghodi-lightbox-content');
+
+    function closeLightbox() {
+        overlay.classList.remove('open');
+        content.innerHTML = '';
+        document.body.style.overflow = '';
+    }
+
+    overlay.addEventListener('click', function (e) {
+        if (e.target === overlay || e.target.closest('.ghodaghodi-lightbox-close')) {
+            closeLightbox();
+        }
+    });
+
+    document.addEventListener('keydown', function (e) {
+        if (e.key === 'Escape' && overlay.classList.contains('open')) {
+            closeLightbox();
+        }
+    });
+
+    triggers.forEach(function (trigger) {
+        trigger.addEventListener('click', function () {
+            var src = trigger.getAttribute('data-ghodaghodi-lightbox');
+            if (!src) return;
+            content.innerHTML = '<img src="' + src + '" alt="" />';
+            overlay.classList.add('open');
+            document.body.style.overflow = 'hidden';
+        });
+    });
+});
+
+document.addEventListener('DOMContentLoaded', function () {
     var copyButtons = document.querySelectorAll('.ghodaghodi-copy-link');
 
     copyButtons.forEach(function (button) {

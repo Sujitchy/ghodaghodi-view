@@ -8,6 +8,112 @@ body {
     font-family: 'Mukta', sans-serif;
 }
 
+@layer components {
+    .prose-ghodaghodi {
+        @apply text-gray-700 leading-relaxed;
+    }
+
+    .prose-ghodaghodi p {
+        @apply mb-5 text-[17px] leading-relaxed text-gray-700;
+    }
+
+    .prose-ghodaghodi h2 {
+        @apply text-2xl font-bold text-gray-900 mt-8 mb-4;
+    }
+
+    .prose-ghodaghodi h3 {
+        @apply text-xl font-bold text-gray-900 mt-6 mb-3;
+    }
+
+    .prose-ghodaghodi h4 {
+        @apply text-lg font-bold text-gray-900 mt-5 mb-2;
+    }
+
+    .prose-ghodaghodi ul {
+        @apply mb-5 list-disc pl-6 space-y-1.5;
+    }
+
+    .prose-ghodaghodi ol {
+        @apply mb-5 list-decimal pl-6 space-y-1.5;
+    }
+
+    .prose-ghodaghodi li {
+        @apply text-[17px] leading-relaxed text-gray-700;
+    }
+
+    .prose-ghodaghodi a {
+        @apply text-emerald-700 underline decoration-emerald-300 decoration-2 underline-offset-2 hover:text-amber-600 transition-colors;
+    }
+
+    .prose-ghodaghodi img {
+        @apply rounded-xl my-6;
+    }
+
+    .prose-ghodaghodi figure img {
+        @apply my-0;
+    }
+
+    .prose-ghodaghodi figcaption {
+        @apply text-sm text-gray-500 mt-2 text-center;
+    }
+
+    .prose-ghodaghodi blockquote {
+        @apply border-l-4 border-emerald-300 pl-4 italic text-gray-600 my-6;
+    }
+
+    .prose-ghodaghodi strong {
+        @apply font-semibold text-gray-900;
+    }
+
+    .prose-ghodaghodi hr {
+        @apply my-8 border-gray-200;
+    }
+}
+
+.ghodaghodi-lightbox-overlay {
+    position: fixed;
+    inset: 0;
+    z-index: 99999;
+    display: none;
+    align-items: center;
+    justify-content: center;
+    background: rgba(0, 0, 0, 0.9);
+    padding: 24px;
+}
+
+.ghodaghodi-lightbox-overlay.open {
+    display: flex;
+}
+
+.ghodaghodi-lightbox-content img {
+    max-width: 100%;
+    max-height: 85vh;
+    border-radius: 12px;
+    box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+}
+
+.ghodaghodi-lightbox-close {
+    position: absolute;
+    top: 16px;
+    right: 16px;
+    width: 44px;
+    height: 44px;
+    border: 0;
+    border-radius: 9999px;
+    background: rgba(255, 255, 255, 0.15);
+    color: #fff;
+    font-size: 20px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: background 0.2s ease;
+}
+
+.ghodaghodi-lightbox-close:hover {
+    background: rgba(255, 255, 255, 0.3);
+}
+
 .hero-slides-wrapper {
     position: relative;
     min-height: 500px;
