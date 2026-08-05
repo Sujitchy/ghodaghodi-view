@@ -382,6 +382,295 @@ function ghodaghodi_destination_save_meta($post_id)
 }
 add_action('save_post', 'ghodaghodi_destination_save_meta');
 
+function ghodaghodi_trek_add_meta_boxes($post)
+{
+    $is_new = empty($post->ID) || 'auto-draft' === $post->post_status;
+
+    $has_trek_data = metadata_exists('post', $post->ID, '_destination_trek_duration')
+        || metadata_exists('post', $post->ID, '_destination_trek_max_elevation')
+        || metadata_exists('post', $post->ID, '_destination_trek_difficulty')
+        || metadata_exists('post', $post->ID, '_destination_trek_permits')
+        || metadata_exists('post', $post->ID, '_destination_trek_itinerary')
+        || metadata_exists('post', $post->ID, '_destination_what_to_pack')
+        || metadata_exists('post', $post->ID, '_destination_trek_tips');
+
+    if (!$is_new && !$has_trek_data && !in_category('destinations', $post)) {
+        return;
+    }
+
+    add_meta_box('ghodaghodi_trek_guide', __('Trek Route Guide', 'ghodaghodi-view'), 'ghodaghodi_trek_meta_callback', 'post', 'normal', 'high');
+}
+add_action('add_meta_boxes_post', 'ghodaghodi_trek_add_meta_boxes');
+
+function ghodaghodi_trek_meta_callback($post)
+{
+    wp_nonce_field('ghodaghodi_trek_meta', 'ghodaghodi_trek_meta_nonce');
+
+    $duration   = get_post_meta($post->ID, '_destination_trek_duration', true);
+    $elevation  = get_post_meta($post->ID, '_destination_trek_max_elevation', true);
+    $difficulty = get_post_meta($post->ID, '_destination_trek_difficulty', true);
+    $permits    = get_post_meta($post->ID, '_destination_trek_permits', true);
+    $itinerary  = json_decode(get_post_meta($post->ID, '_destination_trek_itinerary', true), true);
+    $pack       = get_post_meta($post->ID, '_destination_what_to_pack', true);
+    $tips       = get_post_meta($post->ID, '_destination_trek_tips', true);
+
+    if (!is_array($itinerary)) {
+        $itinerary = [];
+    }
+?>
+    <style>
+        #ghodaghodi_trek_guide h4 {
+            margin: 1.5em 0 0.25em;
+            font-size: 14px;
+        }
+
+        #ghodaghodi_trek_guide .ghodaghodi-itinerary-row {
+            border: 1px solid #ccd0d4;
+            border-radius: 6px;
+            padding: 12px 14px;
+            margin: 10px 0;
+            background: #fff;
+        }
+
+        #ghodaghodi_trek_guide .ghodaghodi-itinerary-row-head {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 8px;
+        }
+
+        #ghodaghodi_trek_guide .ghodaghodi-itinerary-row-title {
+            font-weight: 600;
+        }
+
+        #ghodaghodi_trek_guide .ghodaghodi-itinerary-fields {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 8px 16px;
+        }
+
+        #ghodaghodi_trek_guide .ghodaghodi-itinerary-fields p {
+            margin: 0;
+        }
+
+        #ghodaghodi_trek_guide .ghodaghodi-itinerary-fields label {
+            display: block;
+            font-weight: 600;
+            margin-bottom: 3px;
+        }
+
+        #ghodaghodi_trek_guide .ghodaghodi-itinerary-notes {
+            grid-column: 1 / -1;
+        }
+    </style>
+
+    <table class="form-table">
+        <tr>
+            <th scope="row">
+                <label for="destination_trek_duration"><?php _e('Duration', 'ghodaghodi-view'); ?></label>
+            </th>
+            <td>
+                <input type="text" id="destination_trek_duration" name="destination_trek_duration" value="<?php echo esc_attr($duration); ?>" class="regular-text" placeholder="<?php _e('E.g.: 6 Days', 'ghodaghodi-view'); ?>" />
+                <p class="description"><?php _e('Total duration of the trek', 'ghodaghodi-view'); ?></p>
+            </td>
+        </tr>
+        <tr>
+            <th scope="row">
+                <label for="destination_trek_max_elevation"><?php _e('Max Elevation', 'ghodaghodi-view'); ?></label>
+            </th>
+            <td>
+                <input type="text" id="destination_trek_max_elevation" name="destination_trek_max_elevation" value="<?php echo esc_attr($elevation); ?>" class="regular-text" placeholder="<?php _e('E.g.: 4,200 m', 'ghodaghodi-view'); ?>" />
+                <p class="description"><?php _e('Highest elevation reached on the trek', 'ghodaghodi-view'); ?></p>
+            </td>
+        </tr>
+        <tr>
+            <th scope="row">
+                <label for="destination_trek_difficulty"><?php _e('Difficulty Rating', 'ghodaghodi-view'); ?></label>
+            </th>
+            <td>
+                <select id="destination_trek_difficulty" name="destination_trek_difficulty">
+                    <option value=""><?php _e('— Select Difficulty —', 'ghodaghodi-view'); ?></option>
+                    <?php for ($i = 1; $i <= 5; $i++): ?>
+                        <option value="<?php echo $i; ?>" <?php selected($difficulty, (string) $i); ?>><?php echo $i; ?> / 5</option>
+                    <?php endfor; ?>
+                </select>
+                <p class="description"><?php _e('Difficulty level from 1 (easy) to 5 (very challenging)', 'ghodaghodi-view'); ?></p>
+            </td>
+        </tr>
+        <tr>
+            <th scope="row">
+                <label for="destination_trek_permits"><?php _e('Permits & Fees', 'ghodaghodi-view'); ?></label>
+            </th>
+            <td>
+                <textarea id="destination_trek_permits" name="destination_trek_permits" rows="4" class="large-text" placeholder="<?php _e('E.g.: TIMS card NPR 1,000; park entry NPR 2,000...', 'ghodaghodi-view'); ?>"><?php echo esc_textarea($permits); ?></textarea>
+                <p class="description"><?php _e('Required permits, entry fees and where to obtain them', 'ghodaghodi-view'); ?></p>
+            </td>
+        </tr>
+    </table>
+
+    <h4><?php _e('Day-by-Day Itinerary', 'ghodaghodi-view'); ?></h4>
+    <div id="ghodaghodi-itinerary-rows">
+        <?php foreach ($itinerary as $index => $day): ?>
+            <?php ghodaghodi_trek_itinerary_row($day, $index); ?>
+        <?php endforeach; ?>
+    </div>
+    <p>
+        <button type="button" class="button button-secondary" id="ghodaghodi-add-day"><?php _e('+ Add Day', 'ghodaghodi-view'); ?></button>
+    </p>
+    <p class="description"><?php _e('Add each day of the trek itinerary, including transport hours, elevation and route notes.', 'ghodaghodi-view'); ?></p>
+
+    <h4><?php _e('Guidelines', 'ghodaghodi-view'); ?></h4>
+    <table class="form-table">
+        <tr>
+            <th scope="row">
+                <label for="destination_what_to_pack"><?php _e('What to Pack', 'ghodaghodi-view'); ?></label>
+            </th>
+            <td>
+                <textarea id="destination_what_to_pack" name="destination_what_to_pack" rows="4" class="large-text" placeholder="<?php _e('E.g.: Hiking boots, Sleeping bag, Rain jacket, Water bottle', 'ghodaghodi-view'); ?>"><?php echo esc_textarea($pack); ?></textarea>
+                <p class="description"><?php _e('Comma-separated list of packing essentials', 'ghodaghodi-view'); ?></p>
+            </td>
+        </tr>
+        <tr>
+            <th scope="row">
+                <label for="destination_trek_tips"><?php _e('Tips for Trekkers', 'ghodaghodi-view'); ?></label>
+            </th>
+            <td>
+                <textarea id="destination_trek_tips" name="destination_trek_tips" rows="4" class="large-text" placeholder="<?php _e('E.g.: Acclimatize slowly, Start early, Carry enough water', 'ghodaghodi-view'); ?>"><?php echo esc_textarea($tips); ?></textarea>
+                <p class="description"><?php _e('Comma-separated list of trekking tips', 'ghodaghodi-view'); ?></p>
+            </td>
+        </tr>
+    </table>
+
+    <script type="text/html" id="ghodaghodi-itinerary-row-template">
+        <?php ghodaghodi_trek_itinerary_row([], '__INDEX__'); ?>
+    </script>
+    <script>
+        jQuery(function($) {
+            var $rows = $('#ghodaghodi-itinerary-rows');
+            var template = $('#ghodaghodi-itinerary-row-template').html();
+
+            function reindexRows() {
+                $rows.find('.ghodaghodi-itinerary-row').each(function(index) {
+                    var $row = $(this);
+                    $row.find(':input').each(function() {
+                        var name = $(this).attr('name');
+                        if (name) {
+                            $(this).attr('name', name.replace(/itinerary\[\d+\]/, 'itinerary[' + index + ']'));
+                        }
+                    });
+                });
+            }
+
+            $('#ghodaghodi-add-day').on('click', function() {
+                var index = $rows.find('.ghodaghodi-itinerary-row').length;
+                $rows.append(template.replace(/__INDEX__/g, index));
+            });
+
+            $(document).on('click', '.ghodaghodi-remove-day', function() {
+                $(this).closest('.ghodaghodi-itinerary-row').remove();
+                reindexRows();
+            });
+        });
+    </script>
+<?php
+}
+
+function ghodaghodi_trek_itinerary_row($day, $index)
+{
+    $day = is_array($day) ? $day : [];
+    $get = function ($key) use ($day) {
+        return isset($day[$key]) ? $day[$key] : '';
+    };
+?>
+    <div class="ghodaghodi-itinerary-row">
+        <div class="ghodaghodi-itinerary-row-head">
+            <span class="ghodaghodi-itinerary-row-title"><?php _e('Itinerary Day', 'ghodaghodi-view'); ?></span>
+            <button type="button" class="button-link ghodaghodi-remove-day"><?php _e('Remove', 'ghodaghodi-view'); ?></button>
+        </div>
+        <div class="ghodaghodi-itinerary-fields">
+            <p>
+                <label><?php _e('Day Label', 'ghodaghodi-view'); ?></label>
+                <input type="text" name="itinerary[<?php echo esc_attr($index); ?>][day]" value="<?php echo esc_attr($get('day')); ?>" class="widefat" placeholder="<?php _e('E.g.: Day 1', 'ghodaghodi-view'); ?>" />
+            </p>
+            <p>
+                <label><?php _e('Title', 'ghodaghodi-view'); ?></label>
+                <input type="text" name="itinerary[<?php echo esc_attr($index); ?>][title]" value="<?php echo esc_attr($get('title')); ?>" class="widefat" placeholder="<?php _e('E.g.: Ghodaghodi to Jhiljhile', 'ghodaghodi-view'); ?>" />
+            </p>
+            <p>
+                <label><?php _e('Transport / Hours', 'ghodaghodi-view'); ?></label>
+                <input type="text" name="itinerary[<?php echo esc_attr($index); ?>][transport]" value="<?php echo esc_attr($get('transport')); ?>" class="widefat" placeholder="<?php _e('E.g.: 4-5 hrs drive / 3 hrs hike', 'ghodaghodi-view'); ?>" />
+            </p>
+            <p>
+                <label><?php _e('Elevation', 'ghodaghodi-view'); ?></label>
+                <input type="text" name="itinerary[<?php echo esc_attr($index); ?>][elevation]" value="<?php echo esc_attr($get('elevation')); ?>" class="widefat" placeholder="<?php _e('E.g.: 1,500m – 2,100m', 'ghodaghodi-view'); ?>" />
+            </p>
+            <p class="ghodaghodi-itinerary-notes">
+                <label><?php _e('Route Notes', 'ghodaghodi-view'); ?></label>
+                <textarea name="itinerary[<?php echo esc_attr($index); ?>][notes]" rows="3" class="widefat" placeholder="<?php _e('E.g.: Trail climbs through oak forest with views of Ghodaghodi Lake.', 'ghodaghodi-view'); ?>"><?php echo esc_textarea($get('notes')); ?></textarea>
+            </p>
+        </div>
+    </div>
+<?php
+}
+
+function ghodaghodi_trek_save_meta($post_id)
+{
+    if (!isset($_POST['ghodaghodi_trek_meta_nonce']) || !wp_verify_nonce($_POST['ghodaghodi_trek_meta_nonce'], 'ghodaghodi_trek_meta')) return;
+    if (defined('DOING_AUTOSAVE') && DOING_AUTOSAVE) return;
+    if (!current_user_can('edit_post', $post_id)) return;
+    if ('post' !== get_post_type($post_id)) return;
+
+    if (isset($_POST['destination_trek_duration'])) {
+        update_post_meta($post_id, '_destination_trek_duration', sanitize_text_field(wp_unslash($_POST['destination_trek_duration'])));
+    }
+
+    if (isset($_POST['destination_trek_max_elevation'])) {
+        update_post_meta($post_id, '_destination_trek_max_elevation', sanitize_text_field(wp_unslash($_POST['destination_trek_max_elevation'])));
+    }
+
+    if (isset($_POST['destination_trek_difficulty']) && in_array($_POST['destination_trek_difficulty'], ['1', '2', '3', '4', '5'], true)) {
+        update_post_meta($post_id, '_destination_trek_difficulty', sanitize_text_field($_POST['destination_trek_difficulty']));
+    } else {
+        delete_post_meta($post_id, '_destination_trek_difficulty');
+    }
+
+    if (isset($_POST['destination_trek_permits'])) {
+        update_post_meta($post_id, '_destination_trek_permits', sanitize_textarea_field(wp_unslash($_POST['destination_trek_permits'])));
+    }
+
+    if (isset($_POST['itinerary']) && is_array($_POST['itinerary'])) {
+        $days = [];
+        foreach ($_POST['itinerary'] as $day) {
+            if (!is_array($day)) {
+                continue;
+            }
+
+            $days[] = [
+                'day'       => isset($day['day']) ? sanitize_text_field(wp_unslash($day['day'])) : '',
+                'title'     => isset($day['title']) ? sanitize_text_field(wp_unslash($day['title'])) : '',
+                'transport' => isset($day['transport']) ? sanitize_text_field(wp_unslash($day['transport'])) : '',
+                'elevation' => isset($day['elevation']) ? sanitize_text_field(wp_unslash($day['elevation'])) : '',
+                'notes'     => isset($day['notes']) ? sanitize_textarea_field(wp_unslash($day['notes'])) : '',
+            ];
+        }
+
+        $days = array_values(array_filter($days, function ($day) {
+            return $day['day'] !== '' || $day['title'] !== '';
+        }));
+
+        update_post_meta($post_id, '_destination_trek_itinerary', wp_json_encode($days));
+    }
+
+    if (isset($_POST['destination_what_to_pack'])) {
+        update_post_meta($post_id, '_destination_what_to_pack', sanitize_textarea_field(wp_unslash($_POST['destination_what_to_pack'])));
+    }
+
+    if (isset($_POST['destination_trek_tips'])) {
+        update_post_meta($post_id, '_destination_trek_tips', sanitize_textarea_field(wp_unslash($_POST['destination_trek_tips'])));
+    }
+}
+add_action('save_post', 'ghodaghodi_trek_save_meta');
+
 require_once get_template_directory() . '/inc/template-tags.php';
 require_once get_template_directory() . '/inc/walker.php';
 require_once get_template_directory() . '/inc/customizer.php';
