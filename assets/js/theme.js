@@ -65,3 +65,41 @@ document.addEventListener('DOMContentLoaded', function () {
 
     startAuto();
 });
+
+document.addEventListener('DOMContentLoaded', function () {
+    var copyButtons = document.querySelectorAll('.ghodaghodi-copy-link');
+
+    copyButtons.forEach(function (button) {
+        button.addEventListener('click', function () {
+            var url = button.getAttribute('data-url');
+
+            function copied() {
+                var label = button.getAttribute('data-copied') || 'Copied!';
+                var original = button.innerHTML;
+                button.innerHTML = '<i class="fa-solid fa-check"></i>';
+                button.setAttribute('data-copied', label);
+                setTimeout(function () {
+                    button.innerHTML = original;
+                }, 2000);
+            }
+
+            if (navigator.clipboard && window.isSecureContext) {
+                navigator.clipboard.writeText(url).then(copied);
+            } else {
+                var textarea = document.createElement('textarea');
+                textarea.value = url;
+                textarea.style.position = 'fixed';
+                textarea.style.opacity = '0';
+                document.body.appendChild(textarea);
+                textarea.select();
+                try {
+                    document.execCommand('copy');
+                    copied();
+                } catch (err) {
+                    window.prompt('Copy link:', url);
+                }
+                document.body.removeChild(textarea);
+            }
+        });
+    });
+});

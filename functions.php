@@ -392,7 +392,12 @@ function ghodaghodi_trek_add_meta_boxes($post)
         || metadata_exists('post', $post->ID, '_destination_trek_permits')
         || metadata_exists('post', $post->ID, '_destination_trek_itinerary')
         || metadata_exists('post', $post->ID, '_destination_what_to_pack')
-        || metadata_exists('post', $post->ID, '_destination_trek_tips');
+        || metadata_exists('post', $post->ID, '_destination_trek_tips')
+        || metadata_exists('post', $post->ID, '_destination_region')
+        || metadata_exists('post', $post->ID, '_destination_best_season')
+        || metadata_exists('post', $post->ID, '_destination_why_choose')
+        || metadata_exists('post', $post->ID, '_destination_trek_map')
+        || metadata_exists('post', $post->ID, '_destination_highlights');
 
     if (!$is_new && !$has_trek_data && !in_category('destinations', $post)) {
         return;
@@ -405,17 +410,27 @@ add_action('add_meta_boxes_post', 'ghodaghodi_trek_add_meta_boxes');
 function ghodaghodi_trek_meta_callback($post)
 {
     wp_nonce_field('ghodaghodi_trek_meta', 'ghodaghodi_trek_meta_nonce');
+    wp_enqueue_media();
 
-    $duration   = get_post_meta($post->ID, '_destination_trek_duration', true);
-    $elevation  = get_post_meta($post->ID, '_destination_trek_max_elevation', true);
-    $difficulty = get_post_meta($post->ID, '_destination_trek_difficulty', true);
-    $permits    = get_post_meta($post->ID, '_destination_trek_permits', true);
-    $itinerary  = json_decode(get_post_meta($post->ID, '_destination_trek_itinerary', true), true);
-    $pack       = get_post_meta($post->ID, '_destination_what_to_pack', true);
-    $tips       = get_post_meta($post->ID, '_destination_trek_tips', true);
+    $duration    = get_post_meta($post->ID, '_destination_trek_duration', true);
+    $elevation   = get_post_meta($post->ID, '_destination_trek_max_elevation', true);
+    $difficulty  = get_post_meta($post->ID, '_destination_trek_difficulty', true);
+    $permits     = get_post_meta($post->ID, '_destination_trek_permits', true);
+    $itinerary   = json_decode(get_post_meta($post->ID, '_destination_trek_itinerary', true), true);
+    $pack        = get_post_meta($post->ID, '_destination_what_to_pack', true);
+    $tips        = get_post_meta($post->ID, '_destination_trek_tips', true);
+    $region      = get_post_meta($post->ID, '_destination_region', true);
+    $best_season = get_post_meta($post->ID, '_destination_best_season', true);
+    $why_choose  = get_post_meta($post->ID, '_destination_why_choose', true);
+    $trek_map    = get_post_meta($post->ID, '_destination_trek_map', true);
+    $highlights  = json_decode(get_post_meta($post->ID, '_destination_highlights', true), true);
 
     if (!is_array($itinerary)) {
         $itinerary = [];
+    }
+
+    if (!is_array($highlights)) {
+        $highlights = [];
     }
 ?>
     <style>
@@ -424,7 +439,8 @@ function ghodaghodi_trek_meta_callback($post)
             font-size: 14px;
         }
 
-        #ghodaghodi_trek_guide .ghodaghodi-itinerary-row {
+        #ghodaghodi_trek_guide .ghodaghodi-itinerary-row,
+        #ghodaghodi_trek_guide .ghodaghodi-highlight-row {
             border: 1px solid #ccd0d4;
             border-radius: 6px;
             padding: 12px 14px;
@@ -432,15 +448,44 @@ function ghodaghodi_trek_meta_callback($post)
             background: #fff;
         }
 
-        #ghodaghodi_trek_guide .ghodaghodi-itinerary-row-head {
+        #ghodaghodi_trek_guide .ghodaghodi-itinerary-row-head,
+        #ghodaghodi_trek_guide .ghodaghodi-highlight-row-head {
             display: flex;
             justify-content: space-between;
             align-items: center;
             margin-bottom: 8px;
         }
 
-        #ghodaghodi_trek_guide .ghodaghodi-itinerary-row-title {
+        #ghodaghodi_trek_guide .ghodaghodi-itinerary-row-title,
+        #ghodaghodi_trek_guide .ghodaghodi-highlight-row-title {
             font-weight: 600;
+        }
+
+        #ghodaghodi_trek_guide .ghodaghodi-highlight-fields {
+            display: flex;
+            gap: 16px;
+            align-items: flex-start;
+            flex-wrap: wrap;
+        }
+
+        #ghodaghodi_trek_guide .ghodaghodi-highlight-image {
+            min-width: 170px;
+        }
+
+        #ghodaghodi_trek_guide .ghodaghodi-highlight-caption {
+            flex: 1;
+            min-width: 220px;
+            margin: 0;
+        }
+
+        #ghodaghodi_trek_guide .ghodaghodi-highlight-caption label {
+            display: block;
+            font-weight: 600;
+            margin-bottom: 3px;
+        }
+
+        #ghodaghodi_trek_guide .ghodaghodi-highlight-preview {
+            margin-bottom: 6px;
         }
 
         #ghodaghodi_trek_guide .ghodaghodi-itinerary-fields {
@@ -465,6 +510,24 @@ function ghodaghodi_trek_meta_callback($post)
     </style>
 
     <table class="form-table">
+        <tr>
+            <th scope="row">
+                <label for="destination_region"><?php _e('Region', 'ghodaghodi-view'); ?></label>
+            </th>
+            <td>
+                <input type="text" id="destination_region" name="destination_region" value="<?php echo esc_attr($region); ?>" class="regular-text" placeholder="<?php _e('E.g.: Bajura, Nepal', 'ghodaghodi-view'); ?>" />
+                <p class="description"><?php _e('Geographic region where the trek is located', 'ghodaghodi-view'); ?></p>
+            </td>
+        </tr>
+        <tr>
+            <th scope="row">
+                <label for="destination_best_season"><?php _e('Best Season', 'ghodaghodi-view'); ?></label>
+            </th>
+            <td>
+                <input type="text" id="destination_best_season" name="destination_best_season" value="<?php echo esc_attr($best_season); ?>" class="regular-text" placeholder="<?php _e('E.g.: Spring & Autumn', 'ghodaghodi-view'); ?>" />
+                <p class="description"><?php _e('Best seasons for this trek', 'ghodaghodi-view'); ?></p>
+            </td>
+        </tr>
         <tr>
             <th scope="row">
                 <label for="destination_trek_duration"><?php _e('Duration', 'ghodaghodi-view'); ?></label>
@@ -508,6 +571,25 @@ function ghodaghodi_trek_meta_callback($post)
         </tr>
     </table>
 
+    <h4><?php _e('Why Choose This Trek?', 'ghodaghodi-view'); ?></h4>
+    <p>
+        <textarea id="destination_why_choose" name="destination_why_choose" rows="5" class="large-text" placeholder="<?php _e('E.g.: Stunning views of Badimalika Temple, Rich cultural heritage, Less crowded trail...', 'ghodaghodi-view'); ?>"><?php echo esc_textarea($why_choose); ?></textarea>
+    </p>
+    <p class="description"><?php _e('Key reasons/attractions, one per line or comma-separated.', 'ghodaghodi-view'); ?></p>
+
+    <h4><?php _e('Trek Route Map', 'ghodaghodi-view'); ?></h4>
+    <p>
+        <input type="url" id="destination_trek_map" name="destination_trek_map" value="<?php echo esc_url($trek_map); ?>" class="widefat" placeholder="<?php _e('Image URL or use the button to upload', 'ghodaghodi-view'); ?>" />
+    </p>
+    <p>
+        <button type="button" class="button" id="ghodaghodi-upload-map"><?php _e('Upload / Select Image', 'ghodaghodi-view'); ?></button>
+    </p>
+    <span id="ghodaghodi-map-preview">
+        <?php if ($trek_map): ?>
+            <img src="<?php echo esc_url($trek_map); ?>" alt="" style="max-width:100%;margin-top:8px;border:1px solid #ccd0d4;border-radius:4px;" />
+        <?php endif; ?>
+    </span>
+
     <h4><?php _e('Day-by-Day Itinerary', 'ghodaghodi-view'); ?></h4>
     <div id="ghodaghodi-itinerary-rows">
         <?php foreach ($itinerary as $index => $day): ?>
@@ -518,6 +600,17 @@ function ghodaghodi_trek_meta_callback($post)
         <button type="button" class="button button-secondary" id="ghodaghodi-add-day"><?php _e('+ Add Day', 'ghodaghodi-view'); ?></button>
     </p>
     <p class="description"><?php _e('Add each day of the trek itinerary, including transport hours, elevation and route notes.', 'ghodaghodi-view'); ?></p>
+
+    <h4><?php _e('Highlights Gallery', 'ghodaghodi-view'); ?></h4>
+    <div id="ghodaghodi-highlight-rows">
+        <?php foreach ($highlights as $index => $item): ?>
+            <?php ghodaghodi_trek_highlight_row($item, $index); ?>
+        <?php endforeach; ?>
+    </div>
+    <p>
+        <button type="button" class="button button-secondary" id="ghodaghodi-add-highlight"><?php _e('+ Add Highlight Photo', 'ghodaghodi-view'); ?></button>
+    </p>
+    <p class="description"><?php _e('Highlight photos with optional captions shown in the gallery widget.', 'ghodaghodi-view'); ?></p>
 
     <h4><?php _e('Guidelines', 'ghodaghodi-view'); ?></h4>
     <table class="form-table">
@@ -572,6 +665,81 @@ function ghodaghodi_trek_meta_callback($post)
             });
         });
     </script>
+
+    <script type="text/html" id="ghodaghodi-highlight-row-template">
+        <?php ghodaghodi_trek_highlight_row([], '__INDEX__'); ?>
+    </script>
+    <script>
+        jQuery(function($) {
+            var $highlightRows = $('#ghodaghodi-highlight-rows');
+            var highlightTemplate = $('#ghodaghodi-highlight-row-template').html();
+
+            function bindHighlightUploader($row) {
+                $row.find('.ghodaghodi-upload-highlight').on('click', function(e) {
+                    e.preventDefault();
+                    var frame = wp.media({
+                        title: '<?php echo esc_js(__('Select Highlight Image', 'ghodaghodi-view')); ?>',
+                        button: { text: '<?php echo esc_js(__('Use this image', 'ghodaghodi-view')); ?>' },
+                        multiple: false,
+                        library: { type: 'image' }
+                    });
+                    frame.on('select', function() {
+                        var attachment = frame.state().get('selection').first().toJSON();
+                        $row.find('.ghodaghodi-highlight-image-input').val(attachment.url);
+                        $row.find('.ghodaghodi-highlight-preview').html(
+                            '<img src="' + attachment.url + '" alt="" style="max-width:150px;height:auto;display:block;" />'
+                        );
+                    });
+                    frame.open();
+                });
+            }
+
+            function reindexHighlights() {
+                $highlightRows.find('.ghodaghodi-highlight-row').each(function(index) {
+                    var $row = $(this);
+                    $row.find(':input').each(function() {
+                        var name = $(this).attr('name');
+                        if (name) {
+                            $(this).attr('name', name.replace(/highlights\[\d+\]/, 'highlights[' + index + ']'));
+                        }
+                    });
+                });
+            }
+
+            $highlightRows.find('.ghodaghodi-highlight-row').each(function() {
+                bindHighlightUploader($(this));
+            });
+
+            $('#ghodaghodi-add-highlight').on('click', function() {
+                var index = $highlightRows.find('.ghodaghodi-highlight-row').length;
+                $highlightRows.append(highlightTemplate.replace(/__INDEX__/g, index));
+                bindHighlightUploader($highlightRows.find('.ghodaghodi-highlight-row').last());
+            });
+
+            $(document).on('click', '.ghodaghodi-remove-highlight', function() {
+                $(this).closest('.ghodaghodi-highlight-row').remove();
+                reindexHighlights();
+            });
+
+            $('#ghodaghodi-upload-map').on('click', function(e) {
+                e.preventDefault();
+                var frame = wp.media({
+                    title: '<?php echo esc_js(__('Select Route Map Image', 'ghodaghodi-view')); ?>',
+                    button: { text: '<?php echo esc_js(__('Use this image', 'ghodaghodi-view')); ?>' },
+                    multiple: false,
+                    library: { type: 'image' }
+                });
+                frame.on('select', function() {
+                    var attachment = frame.state().get('selection').first().toJSON();
+                    $('#destination_trek_map').val(attachment.url);
+                    $('#ghodaghodi-map-preview').html(
+                        '<img src="' + attachment.url + '" alt="" style="max-width:100%;margin-top:8px;border:1px solid #ccd0d4;border-radius:4px;" />'
+                    );
+                });
+                frame.open();
+            });
+        });
+    </script>
 <?php
 }
 
@@ -607,6 +775,36 @@ function ghodaghodi_trek_itinerary_row($day, $index)
             <p class="ghodaghodi-itinerary-notes">
                 <label><?php _e('Route Notes', 'ghodaghodi-view'); ?></label>
                 <textarea name="itinerary[<?php echo esc_attr($index); ?>][notes]" rows="3" class="widefat" placeholder="<?php _e('E.g.: Trail climbs through oak forest with views of Ghodaghodi Lake.', 'ghodaghodi-view'); ?>"><?php echo esc_textarea($get('notes')); ?></textarea>
+            </p>
+        </div>
+    </div>
+<?php
+}
+
+function ghodaghodi_trek_highlight_row($item, $index)
+{
+    $item    = is_array($item) ? $item : [];
+    $image   = isset($item['image']) ? $item['image'] : '';
+    $caption = isset($item['caption']) ? $item['caption'] : '';
+?>
+    <div class="ghodaghodi-highlight-row">
+        <div class="ghodaghodi-highlight-row-head">
+            <span class="ghodaghodi-highlight-row-title"><?php _e('Highlight Photo', 'ghodaghodi-view'); ?></span>
+            <button type="button" class="button-link ghodaghodi-remove-highlight"><?php _e('Remove', 'ghodaghodi-view'); ?></button>
+        </div>
+        <div class="ghodaghodi-highlight-fields">
+            <div class="ghodaghodi-highlight-image">
+                <input type="hidden" name="highlights[<?php echo esc_attr($index); ?>][image]" value="<?php echo esc_attr($image); ?>" class="ghodaghodi-highlight-image-input" />
+                <div class="ghodaghodi-highlight-preview">
+                    <?php if ($image): ?>
+                        <img src="<?php echo esc_url($image); ?>" alt="" style="max-width:150px;height:auto;display:block;" />
+                    <?php endif; ?>
+                </div>
+                <button type="button" class="button ghodaghodi-upload-highlight"><?php _e('Choose Image', 'ghodaghodi-view'); ?></button>
+            </div>
+            <p class="ghodaghodi-highlight-caption">
+                <label><?php _e('Caption', 'ghodaghodi-view'); ?></label>
+                <input type="text" name="highlights[<?php echo esc_attr($index); ?>][caption]" value="<?php echo esc_attr($caption); ?>" class="widefat" placeholder="<?php _e('E.g.: Badimalika Temple (4,200m)', 'ghodaghodi-view'); ?>" />
             </p>
         </div>
     </div>
@@ -668,8 +866,98 @@ function ghodaghodi_trek_save_meta($post_id)
     if (isset($_POST['destination_trek_tips'])) {
         update_post_meta($post_id, '_destination_trek_tips', sanitize_textarea_field(wp_unslash($_POST['destination_trek_tips'])));
     }
+
+    if (isset($_POST['destination_region'])) {
+        update_post_meta($post_id, '_destination_region', sanitize_text_field(wp_unslash($_POST['destination_region'])));
+    }
+
+    if (isset($_POST['destination_best_season'])) {
+        update_post_meta($post_id, '_destination_best_season', sanitize_text_field(wp_unslash($_POST['destination_best_season'])));
+    }
+
+    if (isset($_POST['destination_why_choose'])) {
+        update_post_meta($post_id, '_destination_why_choose', sanitize_textarea_field(wp_unslash($_POST['destination_why_choose'])));
+    }
+
+    if (isset($_POST['destination_trek_map'])) {
+        $map = esc_url_raw(wp_unslash($_POST['destination_trek_map']));
+        if ($map) {
+            update_post_meta($post_id, '_destination_trek_map', $map);
+        } else {
+            delete_post_meta($post_id, '_destination_trek_map');
+        }
+    }
+
+    if (isset($_POST['highlights']) && is_array($_POST['highlights'])) {
+        $highlights = [];
+        foreach ($_POST['highlights'] as $item) {
+            if (!is_array($item)) {
+                continue;
+            }
+
+            $image   = isset($item['image']) ? esc_url_raw(wp_unslash($item['image'])) : '';
+            $caption = isset($item['caption']) ? sanitize_text_field(wp_unslash($item['caption'])) : '';
+
+            if ($image) {
+                $highlights[] = ['image' => $image, 'caption' => $caption];
+            }
+        }
+
+        update_post_meta($post_id, '_destination_highlights', wp_json_encode(array_values($highlights)));
+    }
 }
 add_action('save_post', 'ghodaghodi_trek_save_meta');
+
+function ghodaghodi_add_user_social_fields($user)
+{
+?>
+    <h3><?php _e('Author Social Profiles', 'ghodaghodi-view'); ?></h3>
+    <table class="form-table">
+        <tr>
+            <th><label for="ghodaghodi_facebook"><?php _e('Facebook', 'ghodaghodi-view'); ?></label></th>
+            <td>
+                <input type="url" name="ghodaghodi_facebook" id="ghodaghodi_facebook" value="<?php echo esc_attr(get_user_meta($user->ID, 'ghodaghodi_facebook', true)); ?>" class="regular-text" placeholder="https://facebook.com/username" />
+            </td>
+        </tr>
+        <tr>
+            <th><label for="ghodaghodi_twitter"><?php _e('Twitter / X', 'ghodaghodi-view'); ?></label></th>
+            <td>
+                <input type="url" name="ghodaghodi_twitter" id="ghodaghodi_twitter" value="<?php echo esc_attr(get_user_meta($user->ID, 'ghodaghodi_twitter', true)); ?>" class="regular-text" placeholder="https://twitter.com/username" />
+            </td>
+        </tr>
+        <tr>
+            <th><label for="ghodaghodi_instagram"><?php _e('Instagram', 'ghodaghodi-view'); ?></label></th>
+            <td>
+                <input type="url" name="ghodaghodi_instagram" id="ghodaghodi_instagram" value="<?php echo esc_attr(get_user_meta($user->ID, 'ghodaghodi_instagram', true)); ?>" class="regular-text" placeholder="https://instagram.com/username" />
+            </td>
+        </tr>
+        <tr>
+            <th><label for="ghodaghodi_linkedin"><?php _e('LinkedIn', 'ghodaghodi-view'); ?></label></th>
+            <td>
+                <input type="url" name="ghodaghodi_linkedin" id="ghodaghodi_linkedin" value="<?php echo esc_attr(get_user_meta($user->ID, 'ghodaghodi_linkedin', true)); ?>" class="regular-text" placeholder="https://linkedin.com/in/username" />
+            </td>
+        </tr>
+    </table>
+<?php
+}
+add_action('show_user_profile', 'ghodaghodi_add_user_social_fields');
+add_action('edit_user_profile', 'ghodaghodi_add_user_social_fields');
+
+function ghodaghodi_save_user_social_fields($user_id)
+{
+    if (!current_user_can('edit_user', $user_id)) {
+        return false;
+    }
+
+    $fields = ['facebook', 'twitter', 'instagram', 'linkedin'];
+    foreach ($fields as $field) {
+        if (isset($_POST['ghodaghodi_' . $field])) {
+            update_user_meta($user_id, 'ghodaghodi_' . $field, esc_url_raw($_POST['ghodaghodi_' . $field]));
+        }
+    }
+}
+add_action('personal_options_update', 'ghodaghodi_save_user_social_fields');
+add_action('edit_user_profile_update', 'ghodaghodi_save_user_social_fields');
 
 require_once get_template_directory() . '/inc/template-tags.php';
 require_once get_template_directory() . '/inc/walker.php';
