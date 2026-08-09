@@ -6,28 +6,7 @@
         the_post();
     ?>
 
-    <?php if (is_singular('ghodaghodi_dest')): ?>
-
         <?php
-        $duration    = get_post_meta(get_the_ID(), '_destination_trek_duration', true);
-        $elevation   = get_post_meta(get_the_ID(), '_destination_trek_max_elevation', true);
-        $difficulty  = (int) get_post_meta(get_the_ID(), '_destination_trek_difficulty', true);
-        $permits     = get_post_meta(get_the_ID(), '_destination_trek_permits', true);
-        $itinerary   = json_decode(get_post_meta(get_the_ID(), '_destination_trek_itinerary', true), true);
-        $pack        = get_post_meta(get_the_ID(), '_destination_what_to_pack', true);
-        $tips        = get_post_meta(get_the_ID(), '_destination_trek_tips', true);
-        $region      = get_post_meta(get_the_ID(), '_destination_region', true);
-        $best_season = get_post_meta(get_the_ID(), '_destination_best_season', true);
-        $why_choose  = get_post_meta(get_the_ID(), '_destination_why_choose', true);
-        $trek_map    = get_post_meta(get_the_ID(), '_destination_trek_map', true);
-        $highlights  = json_decode(get_post_meta(get_the_ID(), '_destination_highlights', true), true);
-
-        $itinerary   = is_array($itinerary) ? $itinerary : [];
-        $highlights  = is_array($highlights) ? $highlights : [];
-        $pack_items  = $pack ? array_values(array_filter(array_map('trim', explode(',', $pack)))) : [];
-        $tip_items   = $tips ? array_values(array_filter(array_map('trim', explode(',', $tips)))) : [];
-        $why_items   = $why_choose ? array_values(array_filter(array_map('trim', preg_split('/[\r\n,]+/', $why_choose)))) : [];
-
         $categories  = get_the_category();
         $primary_cat = !empty($categories) ? $categories[0] : null;
 
@@ -35,13 +14,8 @@
         $word_count   = count(preg_split('/\s+/', trim($content_text)));
         $reading_time = max(1, (int) round($word_count / 200));
 
-        $difficulty_labels = [
-            1 => __('Easy', 'ghodaghodi-view'),
-            2 => __('Moderate', 'ghodaghodi-view'),
-            3 => __('Challenging', 'ghodaghodi-view'),
-            4 => __('Difficult', 'ghodaghodi-view'),
-            5 => __('Extreme', 'ghodaghodi-view'),
-        ];
+        $dest_category = get_category_by_slug('destinations');
+        $excluded_term = $dest_category ? $dest_category->term_id : 0;
         ?>
 
         <?php // === 1. Hero Banner === ?>
@@ -59,18 +33,15 @@
             <div class="relative container mx-auto px-4 sm:px-6 lg:px-8 pt-40 pb-12 md:pb-16 text-white">
                 <div class="max-w-3xl">
                     <div class="flex flex-wrap items-center gap-2.5 mb-4">
-                        <?php if ($primary_cat): ?>
-                            <span class="inline-flex items-center gap-1.5 bg-emerald-600 text-white text-xs font-semibold px-3 py-1.5 rounded-full">
-                                <i class="fa-solid fa-tag"></i> <?php echo esc_html($primary_cat->name); ?>
-                            </span>
+                        <?php if (!empty($categories)): ?>
+                            <?php foreach (array_slice($categories, 0, 3) as $cat): ?>
+                                <a href="<?php echo esc_url(get_category_link($cat->term_id)); ?>" class="inline-flex items-center gap-1.5 bg-emerald-600 text-white text-xs font-semibold px-3 py-1.5 rounded-full hover:bg-emerald-700 transition">
+                                    <i class="fa-solid fa-tag"></i> <?php echo esc_html($cat->name); ?>
+                                </a>
+                            <?php endforeach; ?>
                         <?php else: ?>
                             <span class="inline-flex items-center gap-1.5 bg-emerald-600 text-white text-xs font-semibold px-3 py-1.5 rounded-full">
-                                <i class="fa-solid fa-location-dot"></i> <?php _e('Destination', 'ghodaghodi-view'); ?>
-                            </span>
-                        <?php endif; ?>
-                        <?php if ($duration): ?>
-                            <span class="inline-flex items-center gap-1.5 bg-amber-400 text-emerald-950 text-xs font-bold px-3 py-1.5 rounded-full">
-                                <i class="fa-regular fa-clock"></i> <?php echo esc_html($duration); ?>
+                                <i class="fa-solid fa-newspaper"></i> <?php _e('ब्लग', 'ghodaghodi-view'); ?>
                             </span>
                         <?php endif; ?>
                     </div>
@@ -95,93 +66,34 @@
 
                 <article id="post-<?php the_ID(); ?>" <?php post_class('lg:col-span-8 min-w-0 space-y-6'); ?>>
 
-                    <?php // Overview ?>
+                    <?php // Content ?>
                     <div class="bg-white rounded-2xl border border-gray-100 shadow-sm p-6 md:p-8">
-                        <h2 class="flex items-center gap-2 text-2xl font-bold text-gray-900 mb-4">
-                            <span class="w-1.5 h-7 bg-emerald-600 rounded-full"></span>
-                            <?php _e('Overview', 'ghodaghodi-view'); ?>
-                        </h2>
                         <div class="prose-ghodaghodi">
                             <?php the_content(); ?>
                         </div>
+
+                        <?php
+                        wp_link_pages([
+                            'before' => '<div class="page-links mt-6 text-sm">' . __('Pages:', 'ghodaghodi-view') . ' ',
+                            'after'  => '</div>',
+                        ]);
+                        ?>
                     </div>
 
-                    <?php // Trek Route Map ?>
-                    <?php if ($trek_map): ?>
-                        <div class="bg-white rounded-2xl border border-gray-100 shadow-sm p-6 md:p-8">
-                            <h2 class="flex items-center gap-2 text-2xl font-bold text-gray-900 mb-5">
-                                <span class="w-1.5 h-7 bg-emerald-600 rounded-full"></span>
-                                <i class="fa-solid fa-map text-emerald-600"></i> <?php _e('Trek Route Map', 'ghodaghodi-view'); ?>
-                            </h2>
-                            <button type="button" data-ghodaghodi-lightbox="<?php echo esc_url($trek_map); ?>" class="group relative w-full block overflow-hidden rounded-xl border border-gray-100 focus:outline-none" aria-label="<?php echo esc_attr(sprintf(__('Open route map for %s in a lightbox', 'ghodaghodi-view'), get_the_title())); ?>">
-                                <img src="<?php echo esc_url($trek_map); ?>" alt="<?php echo esc_attr(sprintf(__('Route map for %s', 'ghodaghodi-view'), get_the_title())); ?>" class="w-full h-auto transition duration-300 group-hover:scale-[1.02]" loading="lazy" />
-                                <span class="absolute inset-0 flex items-center justify-center bg-black/0 group-hover:bg-black/40 transition pointer-events-none">
-                                    <span class="inline-flex items-center gap-2 bg-white text-gray-900 text-sm font-semibold px-4 py-2 rounded-full shadow-lg opacity-0 group-hover:opacity-100 transition">
-                                        <i class="fa-solid fa-magnifying-glass-plus"></i> <?php _e('View Larger Map', 'ghodaghodi-view'); ?>
-                                    </span>
-                                </span>
-                            </button>
-                        </div>
-                    <?php endif; ?>
-
-                    <?php // Trek Itinerary ?>
-                    <?php if (!empty($itinerary)): ?>
-                        <div class="bg-white rounded-2xl border border-gray-100 shadow-sm p-6 md:p-8">
-                            <h2 class="flex items-center gap-2 text-2xl font-bold text-gray-900 mb-6">
-                                <span class="w-1.5 h-7 bg-emerald-600 rounded-full"></span>
-                                <i class="fa-solid fa-route text-emerald-600"></i> <?php _e('Trek Itinerary', 'ghodaghodi-view'); ?>
-                            </h2>
-                            <ol class="relative border-l-2 border-emerald-100 ml-2 space-y-10">
-                                <?php foreach ($itinerary as $day): ?>
-                                    <?php
-                                    $day_label     = isset($day['day']) ? $day['day'] : '';
-                                    $day_title     = isset($day['title']) ? $day['title'] : '';
-                                    $day_transport = isset($day['transport']) ? $day['transport'] : '';
-                                    $day_elevation = isset($day['elevation']) ? $day['elevation'] : '';
-                                    $day_notes     = isset($day['notes']) ? $day['notes'] : '';
-                                    ?>
-                                    <li class="relative pl-8">
-                                        <span class="absolute left-0 top-1.5 -translate-x-1/2 w-4 h-4 rounded-full bg-emerald-500 ring-4 ring-emerald-100"></span>
-                                        <div class="flex flex-wrap items-center gap-2 mb-2">
-                                            <span class="bg-emerald-600 text-white text-xs font-bold px-3 py-1 rounded-full"><?php echo esc_html($day_label); ?></span>
-                                            <h3 class="font-bold text-gray-900 text-lg"><?php echo esc_html($day_title); ?></h3>
-                                        </div>
-                                        <?php if ($day_transport || $day_elevation): ?>
-                                            <div class="flex flex-wrap gap-4 text-xs text-gray-500 mb-2">
-                                                <?php if ($day_transport): ?>
-                                                    <span class="inline-flex items-center gap-1.5"><i class="fa-solid fa-car-side text-emerald-600"></i> <?php echo esc_html($day_transport); ?></span>
-                                                <?php endif; ?>
-                                                <?php if ($day_elevation): ?>
-                                                    <span class="inline-flex items-center gap-1.5"><i class="fa-solid fa-arrow-trend-up text-amber-500"></i> <?php echo esc_html($day_elevation); ?></span>
-                                                <?php endif; ?>
-                                            </div>
-                                        <?php endif; ?>
-                                        <?php if ($day_notes): ?>
-                                            <p class="text-[15px] text-gray-600 leading-relaxed"><?php echo esc_html($day_notes); ?></p>
-                                        <?php endif; ?>
-                                    </li>
+                    <?php // Tags ?>
+                    <?php $tags = get_the_tags(); ?>
+                    <?php if ($tags): ?>
+                        <div class="bg-white rounded-2xl border border-gray-100 shadow-sm p-6">
+                            <h3 class="font-bold text-gray-900 mb-3 flex items-center gap-2">
+                                <i class="fa-solid fa-tags text-emerald-600"></i> <?php _e('ट्यागहरू', 'ghodaghodi-view'); ?>
+                            </h3>
+                            <div class="flex flex-wrap gap-2">
+                                <?php foreach ($tags as $tag): ?>
+                                    <a href="<?php echo esc_url(get_tag_link($tag->term_id)); ?>" class="bg-emerald-50 text-emerald-700 text-xs font-semibold px-3 py-1.5 rounded-full hover:bg-amber-100 transition">
+                                        <i class="fa-solid fa-hashtag"></i> <?php echo esc_html($tag->name); ?>
+                                    </a>
                                 <?php endforeach; ?>
-                            </ol>
-                        </div>
-                    <?php endif; ?>
-
-                    <?php // Why Choose This Trek ?>
-                    <?php if ($why_items): ?>
-                        <div class="bg-white rounded-2xl border border-gray-100 shadow-sm p-6 md:p-8">
-                            <h2 class="flex items-center gap-2 text-2xl font-bold text-gray-900 mb-5">
-                                <span class="w-1.5 h-7 bg-emerald-600 rounded-full"></span>
-                                <i class="fa-solid fa-heart text-rose-500"></i> <?php printf(__('Why Choose %s?', 'ghodaghodi-view'), esc_html(get_the_title())); ?>
-                            </h2>
-                            <ul class="space-y-3">
-                                <?php foreach ($why_items as $item): ?>
-                                    <li class="flex items-start gap-3 rounded-xl border border-gray-100 bg-gray-50 p-4">
-                                        <span class="flex items-center justify-center w-6 h-6 rounded-full bg-emerald-100 text-emerald-600 shrink-0 mt-0.5">
-                                            <i class="fa-solid fa-check text-xs"></i>
-                                        </span>
-                                        <span class="text-sm text-gray-700 leading-relaxed"><?php echo esc_html($item); ?></span>
-                                    </li>
-                                <?php endforeach; ?>
-                            </ul>
+                            </div>
                         </div>
                     <?php endif; ?>
 
@@ -192,7 +104,7 @@
                     ?>
                     <div class="bg-white rounded-2xl border border-gray-100 shadow-sm p-6 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
                         <span class="font-bold text-gray-900 flex items-center gap-2">
-                            <i class="fa-solid fa-share-nodes text-emerald-600"></i> <?php _e('Share This Trek', 'ghodaghodi-view'); ?>
+                            <i class="fa-solid fa-share-nodes text-emerald-600"></i> <?php _e('Share This Article', 'ghodaghodi-view'); ?>
                         </span>
                         <div class="flex items-center gap-2">
                             <a href="https://www.facebook.com/sharer/sharer.php?u=<?php echo esc_attr($share_url); ?>" target="_blank" rel="noopener noreferrer" class="inline-flex items-center justify-center w-10 h-10 rounded-full bg-[#1877F2] text-white hover:opacity-85 transition" aria-label="Facebook">
@@ -257,115 +169,86 @@
                 <aside class="lg:col-span-4 min-w-0">
                     <div class="lg:sticky lg:top-24 space-y-6">
 
-                        <?php // Highlights Gallery ?>
-                        <?php if (!empty($highlights)): ?>
+                        <?php // Recent Posts ?>
+                        <div class="bg-white rounded-2xl border border-gray-100 shadow-sm p-6">
+                            <h3 class="font-bold text-gray-900 mb-4 flex items-center gap-2">
+                                <i class="fa-solid fa-file-lines text-emerald-600"></i> <?php _e('हालैका ब्लगहरू', 'ghodaghodi-view'); ?>
+                            </h3>
+                            <?php
+                            $recent_args = [
+                                'post_type'           => 'post',
+                                'posts_per_page'      => 5,
+                                'post__not_in'        => [get_the_ID()],
+                                'ignore_sticky_posts' => true,
+                            ];
+                            if ($excluded_term) {
+                                $recent_args['category__not_in'] = [$excluded_term];
+                            }
+                            $recent = new WP_Query($recent_args);
+                            ?>
+                            <?php if ($recent->have_posts()): ?>
+                                <ul class="space-y-4">
+                                    <?php while ($recent->have_posts()): $recent->the_post(); ?>
+                                        <li>
+                                            <a href="<?php the_permalink(); ?>" class="group flex gap-3">
+                                                <?php if (has_post_thumbnail()): ?>
+                                                    <span class="w-16 h-16 rounded-lg overflow-hidden shrink-0 bg-gray-100">
+                                                        <?php the_post_thumbnail('thumbnail', ['class' => 'w-full h-full object-cover group-hover:scale-105 transition duration-300', 'alt' => get_the_title()]); ?>
+                                                    </span>
+                                                <?php endif; ?>
+                                                <span>
+                                                    <span class="block text-sm font-semibold text-gray-900 leading-snug group-hover:text-emerald-700 transition"><?php the_title(); ?></span>
+                                                    <span class="block text-xs text-gray-400 mt-1"><i class="fa-regular fa-calendar"></i> <?php echo get_the_date(); ?></span>
+                                                </span>
+                                            </a>
+                                        </li>
+                                    <?php endwhile; wp_reset_postdata(); ?>
+                                </ul>
+                            <?php endif; ?>
+                        </div>
+
+                        <?php // Categories ?>
+                        <div class="bg-white rounded-2xl border border-gray-100 shadow-sm p-6">
+                            <h3 class="font-bold text-gray-900 mb-4 flex items-center gap-2">
+                                <i class="fa-solid fa-folder-open text-amber-500"></i> <?php _e('श्रेणीहरू', 'ghodaghodi-view'); ?>
+                            </h3>
+                            <?php
+                            $cat_args = ['orderby' => 'count', 'order' => 'DESC'];
+                            if ($excluded_term) {
+                                $cat_args['exclude'] = [$excluded_term];
+                            }
+                            $cats = get_categories($cat_args);
+                            ?>
+                            <?php if (!empty($cats)): ?>
+                                <ul class="space-y-2">
+                                    <?php foreach ($cats as $cat): ?>
+                                        <li>
+                                            <a href="<?php echo esc_url(get_category_link($cat->term_id)); ?>" class="flex items-center justify-between text-sm text-gray-700 hover:text-emerald-700 transition py-1.5 px-3 rounded-lg hover:bg-emerald-50">
+                                                <span class="flex items-center gap-2"><i class="fa-solid fa-angle-right text-emerald-500"></i> <?php echo esc_html($cat->name); ?></span>
+                                                <span class="text-xs text-gray-400 bg-gray-100 rounded-full px-2 py-0.5"><?php echo esc_html($cat->count); ?></span>
+                                            </a>
+                                        </li>
+                                    <?php endforeach; ?>
+                                </ul>
+                            <?php endif; ?>
+                        </div>
+
+                        <?php // Tags ?>
+                        <?php
+                        $all_tags = get_tags(['number' => 10, 'orderby' => 'count', 'order' => 'DESC']);
+                        ?>
+                        <?php if (!empty($all_tags)): ?>
                             <div class="bg-white rounded-2xl border border-gray-100 shadow-sm p-6">
                                 <h3 class="font-bold text-gray-900 mb-4 flex items-center gap-2">
-                                    <i class="fa-solid fa-images text-emerald-600"></i> <?php _e('Highlights Gallery', 'ghodaghodi-view'); ?>
+                                    <i class="fa-solid fa-tags text-emerald-600"></i> <?php _e('ट्याग क्लाउड', 'ghodaghodi-view'); ?>
                                 </h3>
-                                <div class="space-y-4">
-                                    <?php foreach ($highlights as $item): ?>
-                                        <?php if (empty($item['image'])) continue; ?>
-                                        <figure class="overflow-hidden rounded-xl">
-                                            <img src="<?php echo esc_url($item['image']); ?>" alt="<?php echo esc_attr(isset($item['caption']) ? $item['caption'] : ''); ?>" class="w-full h-40 object-cover hover:scale-105 transition duration-300" loading="lazy" />
-                                            <?php if (!empty($item['caption'])): ?>
-                                                <figcaption class="text-xs text-gray-500 mt-1.5"><?php echo esc_html($item['caption']); ?></figcaption>
-                                            <?php endif; ?>
-                                        </figure>
+                                <div class="flex flex-wrap gap-2">
+                                    <?php foreach ($all_tags as $tag): ?>
+                                        <a href="<?php echo esc_url(get_tag_link($tag->term_id)); ?>" class="bg-emerald-50 text-emerald-700 text-xs font-semibold px-3 py-1.5 rounded-full hover:bg-amber-100 transition">
+                                            <?php echo esc_html($tag->name); ?>
+                                        </a>
                                     <?php endforeach; ?>
                                 </div>
-                            </div>
-                        <?php endif; ?>
-
-                        <?php // Trek Facts ?>
-                        <?php if ($region || $elevation || $duration || $difficulty || $best_season): ?>
-                            <div class="bg-white rounded-2xl border border-gray-100 shadow-sm p-6">
-                                <h3 class="font-bold text-gray-900 mb-4 flex items-center gap-2">
-                                    <i class="fa-solid fa-mountain-sun text-amber-500"></i> <?php _e('Trek Facts', 'ghodaghodi-view'); ?>
-                                </h3>
-                                <ul class="space-y-3 text-sm">
-                                    <?php if ($region): ?>
-                                        <li class="flex items-center gap-3">
-                                            <span class="w-8 h-8 rounded-full bg-emerald-50 text-emerald-600 flex items-center justify-center shrink-0"><i class="fa-solid fa-location-dot"></i></span>
-                                            <span class="text-gray-500"><?php _e('Region', 'ghodaghodi-view'); ?></span>
-                                            <span class="ml-auto font-semibold text-gray-900 text-right"><?php echo esc_html($region); ?></span>
-                                        </li>
-                                    <?php endif; ?>
-                                    <?php if ($elevation): ?>
-                                        <li class="flex items-center gap-3">
-                                            <span class="w-8 h-8 rounded-full bg-sky-50 text-sky-600 flex items-center justify-center shrink-0"><i class="fa-solid fa-mountain"></i></span>
-                                            <span class="text-gray-500"><?php _e('Max Elevation', 'ghodaghodi-view'); ?></span>
-                                            <span class="ml-auto font-semibold text-gray-900 text-right"><?php echo esc_html($elevation); ?></span>
-                                        </li>
-                                    <?php endif; ?>
-                                    <?php if ($duration): ?>
-                                        <li class="flex items-center gap-3">
-                                            <span class="w-8 h-8 rounded-full bg-violet-50 text-violet-600 flex items-center justify-center shrink-0"><i class="fa-regular fa-clock"></i></span>
-                                            <span class="text-gray-500"><?php _e('Duration', 'ghodaghodi-view'); ?></span>
-                                            <span class="ml-auto font-semibold text-gray-900 text-right"><?php echo esc_html($duration); ?></span>
-                                        </li>
-                                    <?php endif; ?>
-                                    <?php if ($difficulty): ?>
-                                        <li class="flex items-center gap-3">
-                                            <span class="w-8 h-8 rounded-full bg-amber-50 text-amber-500 flex items-center justify-center shrink-0"><i class="fa-solid fa-signal"></i></span>
-                                            <span class="text-gray-500"><?php _e('Difficulty', 'ghodaghodi-view'); ?></span>
-                                            <span class="ml-auto flex items-center gap-0.5" title="<?php echo esc_attr(isset($difficulty_labels[$difficulty]) ? $difficulty_labels[$difficulty] : sprintf(__('Difficulty: %1$d / 5', 'ghodaghodi-view'), $difficulty)); ?>">
-                                                <?php for ($i = 1; $i <= 5; $i++): ?>
-                                                    <i class="text-xs <?php echo $i <= $difficulty ? 'fa-solid fa-star text-amber-400' : 'fa-regular fa-star text-gray-300'; ?>"></i>
-                                                <?php endfor; ?>
-                                            </span>
-                                        </li>
-                                    <?php endif; ?>
-                                    <?php if ($best_season): ?>
-                                        <li class="flex items-center gap-3">
-                                            <span class="w-8 h-8 rounded-full bg-rose-50 text-rose-500 flex items-center justify-center shrink-0"><i class="fa-solid fa-calendar-days"></i></span>
-                                            <span class="text-gray-500"><?php _e('Best Season', 'ghodaghodi-view'); ?></span>
-                                            <span class="ml-auto font-semibold text-gray-900 text-right"><?php echo esc_html($best_season); ?></span>
-                                        </li>
-                                    <?php endif; ?>
-                                </ul>
-                            </div>
-                        <?php endif; ?>
-
-                        <?php // Permits & Fees ?>
-                        <?php if ($permits): ?>
-                            <div class="bg-emerald-50 border border-emerald-200 rounded-2xl p-6">
-                                <h3 class="font-bold text-gray-900 mb-3 flex items-center gap-2">
-                                    <i class="fa-solid fa-ticket text-emerald-600"></i> <?php _e('Permits & Fees', 'ghodaghodi-view'); ?>
-                                </h3>
-                                <p class="text-sm text-emerald-950 leading-relaxed whitespace-pre-line"><?php echo esc_html($permits); ?></p>
-                            </div>
-                        <?php endif; ?>
-
-                        <?php // What to Pack ?>
-                        <?php if ($pack_items): ?>
-                            <div class="bg-white rounded-2xl border border-gray-100 shadow-sm p-6">
-                                <h3 class="font-bold text-gray-900 mb-3 flex items-center gap-2">
-                                    <i class="fa-solid fa-suitcase text-emerald-600"></i> <?php _e('What to Pack', 'ghodaghodi-view'); ?>
-                                </h3>
-                                <ul class="space-y-2">
-                                    <?php foreach ($pack_items as $item): ?>
-                                        <li class="flex items-start gap-2 text-sm text-gray-700">
-                                            <i class="fa-solid fa-circle-check text-emerald-500 mt-0.5"></i> <span><?php echo esc_html($item); ?></span>
-                                        </li>
-                                    <?php endforeach; ?>
-                                </ul>
-                            </div>
-                        <?php endif; ?>
-
-                        <?php // Tips for Trekkers ?>
-                        <?php if ($tip_items): ?>
-                            <div class="bg-amber-50 border border-amber-100 rounded-2xl p-6">
-                                <h3 class="font-bold text-gray-900 mb-3 flex items-center gap-2">
-                                    <i class="fa-solid fa-lightbulb text-amber-500"></i> <?php _e('Tips for Trekkers', 'ghodaghodi-view'); ?>
-                                </h3>
-                                <ul class="space-y-2">
-                                    <?php foreach ($tip_items as $tip): ?>
-                                        <li class="flex items-start gap-2 text-sm text-gray-700">
-                                            <i class="fa-solid fa-leaf text-emerald-600 mt-0.5"></i> <span><?php echo esc_html($tip); ?></span>
-                                        </li>
-                                    <?php endforeach; ?>
-                                </ul>
                             </div>
                         <?php endif; ?>
 
@@ -374,21 +257,26 @@
             </div>
         </div>
 
-        <?php // === 3. You May Also Like === ?>
+        <?php // === 4. You May Also Like === ?>
         <?php
-        $related = new WP_Query([
-            'post_type'      => 'ghodaghodi_dest',
+        $related_args = [
+            'post_type'      => 'post',
             'posts_per_page' => 3,
             'post__not_in'   => [get_the_ID()],
             'orderby'        => 'rand',
-        ]);
+            'ignore_sticky_posts' => true,
+        ];
+        if ($excluded_term) {
+            $related_args['category__not_in'] = [$excluded_term];
+        }
+        $related = new WP_Query($related_args);
 
         if ($related->have_posts()):
         ?>
         <section class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pb-16">
             <h3 class="text-2xl font-bold text-gray-900 mb-6 flex items-center gap-2">
                 <span class="w-1.5 h-7 bg-emerald-600 rounded-full"></span>
-                <i class="fa-solid fa-route text-emerald-600"></i> <?php _e('You May Also Like', 'ghodaghodi-view'); ?>
+                <i class="fa-solid fa-book-open text-emerald-600"></i> <?php _e('साथै पढ्नुहोस्', 'ghodaghodi-view'); ?>
             </h3>
             <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
                 <?php while ($related->have_posts()): $related->the_post(); ?>
@@ -397,7 +285,12 @@
                             <?php if (has_post_thumbnail()): ?>
                                 <?php the_post_thumbnail('medium_large', ['class' => 'w-full h-full object-cover group-hover:scale-105 transition duration-300', 'alt' => get_the_title()]); ?>
                             <?php endif; ?>
-                            <span class="absolute top-3 left-3 bg-emerald-600 text-white text-xs font-bold px-2 py-1 rounded"><?php _e('Destination', 'ghodaghodi-view'); ?></span>
+                            <?php
+                            $rcat = get_the_category();
+                            if (!empty($rcat)):
+                            ?>
+                                <span class="absolute top-3 left-3 bg-emerald-600 text-white text-xs font-bold px-2 py-1 rounded"><?php echo esc_html($rcat[0]->name); ?></span>
+                            <?php endif; ?>
                         </div>
                         <div class="p-5">
                             <p class="text-xs text-gray-400 mb-1 flex items-center gap-1.5"><i class="fa-regular fa-calendar"></i> <?php echo get_the_date(); ?></p>
@@ -408,49 +301,6 @@
             </div>
         </section>
         <?php endif; ?>
-
-    <?php else: ?>
-
-        <?php get_template_part('template-parts/featured-hero'); ?>
-
-        <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-10">
-            <article id="post-<?php the_ID(); ?>" <?php post_class('bg-white rounded-xl shadow-sm border border-gray-100'); ?>>
-
-                <div class="p-6 md:p-10">
-                    <div class="flex flex-wrap gap-2 mb-4">
-                        <?php
-                        $categories = get_the_category();
-                        foreach ($categories as $cat) {
-                            echo '<span class="bg-emerald-100 text-emerald-800 text-xs font-semibold px-3 py-1 rounded-full">' . esc_html($cat->name) . '</span>';
-                        }
-                        ?>
-                    </div>
-
-                    <h1 class="text-3xl md:text-4xl font-extrabold text-gray-900 mb-4"><?php the_title(); ?></h1>
-
-                    <div class="flex items-center text-sm text-gray-500 mb-6 gap-4">
-                        <span><i class="fa-regular fa-calendar"></i> <?php echo get_the_date(); ?></span>
-                        <span><i class="fa-regular fa-user"></i> <?php the_author(); ?></span>
-                    </div>
-
-                    <div class="prose-ghodaghodi">
-                        <?php the_content(); ?>
-                    </div>
-
-                    <div class="mt-8 pt-6 border-t border-gray-100">
-                        <?php
-                        the_tags(
-                            '<div class="flex flex-wrap gap-2 text-sm"><span class="font-semibold text-gray-700">ट्यागहरू:</span>',
-                            '',
-                            '</div>'
-                        );
-                        ?>
-                    </div>
-                </div>
-            </article>
-        </div>
-
-    <?php endif; ?>
 
     <?php endwhile; ?>
 </main>
