@@ -9,6 +9,8 @@
 
     <?php get_template_part('inc/section', 'hotels') ?>
 
+    <?php get_template_part('inc/section', 'blogs') ?>
+
     <?php get_template_part('inc/section', 'qr') ?>
 
 </main>

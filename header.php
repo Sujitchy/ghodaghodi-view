@@ -44,6 +44,7 @@
                     <li><a href="#dashboard" class="block py-2 md:py-0 hover:text-[#FFD700] transition">ड्यासबोर्ड</a></li>
                     <li><a href="#destinations" class="block py-2 md:py-0 hover:text-[#FFD700] transition">गन्तव्यहरू</a></li>
                     <li><a href="#hotels" class="block py-2 md:py-0 hover:text-[#FFD700] transition">होटल तथा होमस्टे</a></li>
+                    <li><a href="#blogs" class="block py-2 md:py-0 hover:text-[#FFD700] transition">ब्लग</a></li>
                     <li><a href="#qr-section" class="block py-2 md:py-0 hover:text-[#FFD700] transition">डिजिटल क्युआर</a></li>
                 </ul>
                 <?php
