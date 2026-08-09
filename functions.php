@@ -156,8 +156,39 @@ function ghodaghodi_register_hotel_post_type()
 }
 add_action('init', 'ghodaghodi_register_hotel_post_type');
 
+function ghodaghodi_register_destination_post_type()
+{
+    register_post_type('ghodaghodi_dest', [
+        'labels' => [
+            'name'               => __('Destinations', 'ghodaghodi-view'),
+            'singular_name'      => __('Destination', 'ghodaghodi-view'),
+            'add_new'            => __('Add New', 'ghodaghodi-view'),
+            'add_new_item'       => __('Add New Destination', 'ghodaghodi-view'),
+            'edit_item'          => __('Edit Destination', 'ghodaghodi-view'),
+            'new_item'           => __('New Destination', 'ghodaghodi-view'),
+            'view_item'          => __('View Destination', 'ghodaghodi-view'),
+            'search_items'       => __('Search Destinations', 'ghodaghodi-view'),
+            'not_found'          => __('No destinations found', 'ghodaghodi-view'),
+            'not_found_in_trash' => __('No destinations found in Trash', 'ghodaghodi-view'),
+            'all_items'          => __('All Destinations', 'ghodaghodi-view'),
+            'menu_name'          => __('Destinations', 'ghodaghodi-view'),
+        ],
+        'public'             => true,
+        'publicly_queryable' => true,
+        'show_ui'            => true,
+        'show_in_menu'       => true,
+        'menu_icon'          => 'dashicons-palmtree',
+        'menu_position'      => 22,
+        'supports'           => ['title', 'editor', 'thumbnail', 'excerpt'],
+        'has_archive'        => false,
+        'rewrite'            => ['slug' => 'destination', 'with_front' => false],
+        'show_in_rest'       => false,
+    ]);
+}
+add_action('init', 'ghodaghodi_register_destination_post_type');
+
 add_filter('use_block_editor_for_post_type', function ($enabled, $post_type) {
-    if ('ghodaghodi_hotel' === $post_type) {
+    if ('ghodaghodi_hotel' === $post_type || 'ghodaghodi_dest' === $post_type) {
         return false;
     }
     return $enabled;
@@ -301,15 +332,15 @@ function ghodaghodi_hotel_save_meta($post_id)
 }
 add_action('save_post_ghodaghodi_hotel', 'ghodaghodi_hotel_save_meta');
 
-function ghodaghodi_destination_add_meta_boxes()
+function ghodaghodi_dest_add_meta_boxes()
 {
-    add_meta_box('ghodaghodi_destination_details', __('Destination Details', 'ghodaghodi-view'), 'ghodaghodi_destination_meta_callback', 'post', 'normal', 'high');
+    add_meta_box('ghodaghodi_dest_details', __('Destination Details', 'ghodaghodi-view'), 'ghodaghodi_dest_meta_callback', 'ghodaghodi_dest', 'normal', 'high');
 }
-add_action('add_meta_boxes', 'ghodaghodi_destination_add_meta_boxes');
+add_action('add_meta_boxes', 'ghodaghodi_dest_add_meta_boxes');
 
-function ghodaghodi_destination_meta_callback($post)
+function ghodaghodi_dest_meta_callback($post)
 {
-    wp_nonce_field('ghodaghodi_destination_meta', 'ghodaghodi_destination_meta_nonce');
+    wp_nonce_field('ghodaghodi_dest_meta', 'ghodaghodi_dest_meta_nonce');
     $location  = get_post_meta($post->ID, '_destination_location', true);
     $best_time = get_post_meta($post->ID, '_destination_best_time', true);
     $season    = get_post_meta($post->ID, '_destination_season', true);
@@ -359,12 +390,12 @@ function ghodaghodi_destination_meta_callback($post)
 <?php
 }
 
-function ghodaghodi_destination_save_meta($post_id)
+function ghodaghodi_dest_save_meta($post_id)
 {
-    if (!isset($_POST['ghodaghodi_destination_meta_nonce']) || !wp_verify_nonce($_POST['ghodaghodi_destination_meta_nonce'], 'ghodaghodi_destination_meta')) return;
+    if (!isset($_POST['ghodaghodi_dest_meta_nonce']) || !wp_verify_nonce($_POST['ghodaghodi_dest_meta_nonce'], 'ghodaghodi_dest_meta')) return;
     if (defined('DOING_AUTOSAVE') && DOING_AUTOSAVE) return;
     if (!current_user_can('edit_post', $post_id)) return;
-    if ('post' !== get_post_type($post_id)) return;
+    if ('ghodaghodi_dest' !== get_post_type($post_id)) return;
 
     $fields = ['destination_location', 'destination_best_time'];
     foreach ($fields as $field) {
@@ -380,32 +411,17 @@ function ghodaghodi_destination_save_meta($post_id)
         delete_post_meta($post_id, '_destination_season');
     }
 }
-add_action('save_post', 'ghodaghodi_destination_save_meta');
+add_action('save_post', 'ghodaghodi_dest_save_meta');
 
 function ghodaghodi_trek_add_meta_boxes($post)
 {
-    $is_new = empty($post->ID) || 'auto-draft' === $post->post_status;
-
-    $has_trek_data = metadata_exists('post', $post->ID, '_destination_trek_duration')
-        || metadata_exists('post', $post->ID, '_destination_trek_max_elevation')
-        || metadata_exists('post', $post->ID, '_destination_trek_difficulty')
-        || metadata_exists('post', $post->ID, '_destination_trek_permits')
-        || metadata_exists('post', $post->ID, '_destination_trek_itinerary')
-        || metadata_exists('post', $post->ID, '_destination_what_to_pack')
-        || metadata_exists('post', $post->ID, '_destination_trek_tips')
-        || metadata_exists('post', $post->ID, '_destination_region')
-        || metadata_exists('post', $post->ID, '_destination_best_season')
-        || metadata_exists('post', $post->ID, '_destination_why_choose')
-        || metadata_exists('post', $post->ID, '_destination_trek_map')
-        || metadata_exists('post', $post->ID, '_destination_highlights');
-
-    if (!$is_new && !$has_trek_data && !in_category('destinations', $post)) {
+    if ('ghodaghodi_dest' !== get_post_type($post)) {
         return;
     }
 
-    add_meta_box('ghodaghodi_trek_guide', __('Trek Route Guide', 'ghodaghodi-view'), 'ghodaghodi_trek_meta_callback', 'post', 'normal', 'high');
+    add_meta_box('ghodaghodi_trek_guide', __('Trek Route Guide', 'ghodaghodi-view'), 'ghodaghodi_trek_meta_callback', 'ghodaghodi_dest', 'normal', 'high');
 }
-add_action('add_meta_boxes_post', 'ghodaghodi_trek_add_meta_boxes');
+add_action('add_meta_boxes_ghodaghodi_dest', 'ghodaghodi_trek_add_meta_boxes');
 
 function ghodaghodi_trek_meta_callback($post)
 {
@@ -816,7 +832,7 @@ function ghodaghodi_trek_save_meta($post_id)
     if (!isset($_POST['ghodaghodi_trek_meta_nonce']) || !wp_verify_nonce($_POST['ghodaghodi_trek_meta_nonce'], 'ghodaghodi_trek_meta')) return;
     if (defined('DOING_AUTOSAVE') && DOING_AUTOSAVE) return;
     if (!current_user_can('edit_post', $post_id)) return;
-    if ('post' !== get_post_type($post_id)) return;
+    if ('ghodaghodi_dest' !== get_post_type($post_id)) return;
 
     if (isset($_POST['destination_trek_duration'])) {
         update_post_meta($post_id, '_destination_trek_duration', sanitize_text_field(wp_unslash($_POST['destination_trek_duration'])));

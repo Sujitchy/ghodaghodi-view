@@ -6,7 +6,7 @@
         the_post();
     ?>
 
-    <?php if (in_category('destinations')): ?>
+    <?php if (is_singular('ghodaghodi_dest')): ?>
 
         <?php
         $duration    = get_post_meta(get_the_ID(), '_destination_trek_duration', true);
@@ -62,6 +62,10 @@
                         <?php if ($primary_cat): ?>
                             <span class="inline-flex items-center gap-1.5 bg-emerald-600 text-white text-xs font-semibold px-3 py-1.5 rounded-full">
                                 <i class="fa-solid fa-tag"></i> <?php echo esc_html($primary_cat->name); ?>
+                            </span>
+                        <?php else: ?>
+                            <span class="inline-flex items-center gap-1.5 bg-emerald-600 text-white text-xs font-semibold px-3 py-1.5 rounded-full">
+                                <i class="fa-solid fa-location-dot"></i> <?php _e('Destination', 'ghodaghodi-view'); ?>
                             </span>
                         <?php endif; ?>
                         <?php if ($duration): ?>
@@ -373,9 +377,8 @@
         <?php // === 3. You May Also Like === ?>
         <?php
         $related = new WP_Query([
-            'post_type'      => 'post',
+            'post_type'      => 'ghodaghodi_dest',
             'posts_per_page' => 3,
-            'category_name'  => 'destinations',
             'post__not_in'   => [get_the_ID()],
             'orderby'        => 'rand',
         ]);

@@ -12,16 +12,15 @@
     <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
         <?php
         $destinations = new WP_Query([
-            'post_type'      => 'post',
+            'post_type'      => 'ghodaghodi_dest',
             'posts_per_page' => 3,
-            'category_name'  => 'destinations',
             'meta_key'       => '_thumbnail_id',
         ]);
 
         if ($destinations->have_posts()):
             while ($destinations->have_posts()): $destinations->the_post();
                 $categories = get_the_category();
-                $cat_name   = !empty($categories) ? $categories[0]->name : __('सामान्य', 'ghodaghodi-view');
+                $cat_name   = !empty($categories) ? $categories[0]->name : __('गन्तव्य', 'ghodaghodi-view');
                 $location   = get_post_meta(get_the_ID(), '_destination_location', true);
                 $best_time  = get_post_meta(get_the_ID(), '_destination_best_time', true);
                 $season     = get_post_meta(get_the_ID(), '_destination_season', true);
