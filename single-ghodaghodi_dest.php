@@ -15,7 +15,7 @@
         $pack        = get_post_meta(get_the_ID(), '_destination_what_to_pack', true);
         $tips        = get_post_meta(get_the_ID(), '_destination_trek_tips', true);
         $region      = get_post_meta(get_the_ID(), '_destination_region', true);
-        $best_season = get_post_meta(get_the_ID(), '_destination_best_season', true);
+        $best_time_to_visit = ghodaghodi_get_best_time_to_visit(get_the_ID());
         $why_choose  = get_post_meta(get_the_ID(), '_destination_why_choose', true);
         $trek_map    = get_post_meta(get_the_ID(), '_destination_trek_map', true);
         $highlights  = json_decode(get_post_meta(get_the_ID(), '_destination_highlights', true), true);
@@ -279,7 +279,8 @@
                         <?php endif; ?>
 
                         <?php // Trek Facts ?>
-                        <?php if ($region || $elevation || $duration || $difficulty || $best_season): ?>
+                        <?php $has_best_time = ($best_time_to_visit['peak_months'] || $best_time_to_visit['seasons'] || $best_time_to_visit['why_visit_then']); ?>
+                        <?php if ($region || $elevation || $duration || $difficulty || $has_best_time): ?>
                             <div class="bg-white rounded-2xl border border-gray-100 shadow-sm p-6">
                                 <h3 class="font-bold text-gray-900 mb-4 flex items-center gap-2">
                                     <i class="fa-solid fa-mountain-sun text-amber-500"></i> <?php _e('Trek Facts', 'ghodaghodi-view'); ?>
@@ -317,11 +318,25 @@
                                             </span>
                                         </li>
                                     <?php endif; ?>
-                                    <?php if ($best_season): ?>
-                                        <li class="flex items-center gap-3">
+                                    <?php if ($has_best_time): ?>
+                                        <li class="flex items-start gap-3">
                                             <span class="w-8 h-8 rounded-full bg-rose-50 text-rose-500 flex items-center justify-center shrink-0"><i class="fa-solid fa-calendar-days"></i></span>
-                                            <span class="text-gray-500"><?php _e('Best Season', 'ghodaghodi-view'); ?></span>
-                                            <span class="ml-auto font-semibold text-gray-900 text-right"><?php echo esc_html($best_season); ?></span>
+                                            <span class="text-gray-500 pt-1"><?php _e('Best Time to Visit', 'ghodaghodi-view'); ?></span>
+                                            <span class="ml-auto font-semibold text-gray-900 text-right text-xs leading-relaxed pt-1">
+                                                <?php if ($best_time_to_visit['peak_months']): ?>
+                                                    <span class="block"><?php echo esc_html(implode(', ', $best_time_to_visit['peak_months'])); ?></span>
+                                                <?php endif; ?>
+                                                <?php if ($best_time_to_visit['seasons']): ?>
+                                                    <span class="block"><?php echo esc_html($best_time_to_visit['seasons']); ?></span>
+                                                <?php endif; ?>
+                                            </span>
+                                        </li>
+                                    <?php endif; ?>
+                                    <?php if ($best_time_to_visit['why_visit_then']): ?>
+                                        <li class="flex items-start gap-3">
+                                            <span class="w-8 h-8 rounded-full bg-emerald-50 text-emerald-600 flex items-center justify-center shrink-0"><i class="fa-solid fa-circle-info"></i></span>
+                                            <span class="text-gray-500 pt-1"><?php _e('Why Visit Then?', 'ghodaghodi-view'); ?></span>
+                                            <span class="ml-auto font-medium text-gray-700 text-right text-xs leading-relaxed max-w-xs pt-1"><?php echo esc_html($best_time_to_visit['why_visit_then']); ?></span>
                                         </li>
                                     <?php endif; ?>
                                 </ul>

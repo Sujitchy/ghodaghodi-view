@@ -340,20 +340,69 @@ function ghodaghodi_dest_add_meta_boxes()
 }
 add_action('add_meta_boxes', 'ghodaghodi_dest_add_meta_boxes');
 
-function ghodaghodi_dest_meta_callback($post)
+/**
+ * Get the unified "best time to visit" data for a destination.
+ *
+ * Reads the single _destination_best_time_to_visit JSON meta (peak_months,
+ * seasons, why_visit_then). Falls back to the legacy _destination_best_time,
+ * _destination_season and _destination_best_season fields so existing posts
+ * keep working until they are re-saved.
+ */
+function ghodaghodi_get_best_time_to_visit($post_id)
 {
-    wp_nonce_field('ghodaghodi_dest_meta', 'ghodaghodi_dest_meta_nonce');
-    $location  = get_post_meta($post->ID, '_destination_location', true);
-    $best_time = get_post_meta($post->ID, '_destination_best_time', true);
-    $season    = get_post_meta($post->ID, '_destination_season', true);
+    $data = get_post_meta($post_id, '_destination_best_time_to_visit', true);
 
-    $seasons = [
+    if ($data) {
+        $data = json_decode($data, true);
+        if (is_array($data)) {
+            $peak_months = isset($data['peak_months']) && is_array($data['peak_months']) ? array_values($data['peak_months']) : [];
+            $seasons     = isset($data['seasons']) ? (string) $data['seasons'] : '';
+            $why         = isset($data['why_visit_then']) ? (string) $data['why_visit_then'] : '';
+
+            if ($peak_months || $seasons || $why) {
+                return [
+                    'peak_months'    => $peak_months,
+                    'seasons'        => $seasons,
+                    'why_visit_then' => $why,
+                ];
+            }
+        }
+    }
+
+    $season_labels = [
         'spring'   => __('Spring', 'ghodaghodi-view'),
         'summer'   => __('Summer', 'ghodaghodi-view'),
         'autumn'   => __('Autumn', 'ghodaghodi-view'),
         'winter'   => __('Winter', 'ghodaghodi-view'),
         'all_year' => __('All Year', 'ghodaghodi-view'),
     ];
+
+    $season_key = get_post_meta($post_id, '_destination_season', true);
+    $seasons    = isset($season_labels[$season_key]) ? $season_labels[$season_key] : '';
+    $best_season = get_post_meta($post_id, '_destination_best_season', true);
+    if ($best_season) {
+        $seasons = $best_season;
+    }
+
+    $best_time = get_post_meta($post_id, '_destination_best_time', true);
+    $peak_months = $best_time ? array_values(array_filter(array_map('trim', explode(',', $best_time)))) : [];
+
+    return [
+        'peak_months'    => $peak_months,
+        'seasons'        => $seasons,
+        'why_visit_then' => '',
+    ];
+}
+
+function ghodaghodi_dest_meta_callback($post)
+{
+    wp_nonce_field('ghodaghodi_dest_meta', 'ghodaghodi_dest_meta_nonce');
+    $location = get_post_meta($post->ID, '_destination_location', true);
+    $best     = ghodaghodi_get_best_time_to_visit($post->ID);
+
+    $peak_months = implode(', ', $best['peak_months']);
+    $seasons     = $best['seasons'];
+    $why         = $best['why_visit_then'];
 ?>
     <table class="form-table">
         <tr>
@@ -367,25 +416,24 @@ function ghodaghodi_dest_meta_callback($post)
         </tr>
         <tr>
             <th scope="row">
-                <label for="destination_best_time"><?php _e('Best Time to Visit', 'ghodaghodi-view'); ?></label>
+                <label><?php _e('Best Time to Visit', 'ghodaghodi-view'); ?></label>
             </th>
             <td>
-                <input type="text" id="destination_best_time" name="destination_best_time" value="<?php echo esc_attr($best_time); ?>" class="regular-text" placeholder="<?php _e('E.g.: Sept–Nov, Feb–Apr', 'ghodaghodi-view'); ?>" />
-                <p class="description"><?php _e('Recommended time of year to visit', 'ghodaghodi-view'); ?></p>
-            </td>
-        </tr>
-        <tr>
-            <th scope="row">
-                <label for="destination_season"><?php _e('Recommended Season', 'ghodaghodi-view'); ?></label>
-            </th>
-            <td>
-                <select id="destination_season" name="destination_season">
-                    <option value=""><?php _e('— Select Season —', 'ghodaghodi-view'); ?></option>
-                    <?php foreach ($seasons as $value => $label): ?>
-                        <option value="<?php echo esc_attr($value); ?>" <?php selected($season, $value); ?>><?php echo esc_html($label); ?></option>
-                    <?php endforeach; ?>
-                </select>
-                <p class="description"><?php _e('The season recommended for visiting this destination', 'ghodaghodi-view'); ?></p>
+                <p>
+                    <label for="destination_btv_peak_months" style="font-weight:600;"><?php _e('Peak Months', 'ghodaghodi-view'); ?></label>
+                    <input type="text" id="destination_btv_peak_months" name="destination_btv_peak_months" value="<?php echo esc_attr($peak_months); ?>" class="regular-text" placeholder="<?php _e('E.g.: Sept, Oct, Nov, Feb, Mar, Apr', 'ghodaghodi-view'); ?>" />
+                    <span class="description"><?php _e('Comma-separated peak travel months', 'ghodaghodi-view'); ?></span>
+                </p>
+                <p>
+                    <label for="destination_btv_seasons" style="font-weight:600;"><?php _e('Seasons', 'ghodaghodi-view'); ?></label>
+                    <input type="text" id="destination_btv_seasons" name="destination_btv_seasons" value="<?php echo esc_attr($seasons); ?>" class="regular-text" placeholder="<?php _e('E.g.: Autumn / Spring', 'ghodaghodi-view'); ?>" />
+                    <span class="description"><?php _e('Recommended seasons', 'ghodaghodi-view'); ?></span>
+                </p>
+                <p>
+                    <label for="destination_btv_why" style="font-weight:600;"><?php _e('Why Visit Then?', 'ghodaghodi-view'); ?></label>
+                    <textarea id="destination_btv_why" name="destination_btv_why" rows="3" class="large-text" placeholder="<?php _e('E.g.: Clear skies, mild temperatures and vibrant festivals make this the ideal window for trekking and lake visits.', 'ghodaghodi-view'); ?>"><?php echo esc_textarea($why); ?></textarea>
+                    <span class="description"><?php _e('Weather, activities and festivals during this period', 'ghodaghodi-view'); ?></span>
+                </p>
             </td>
         </tr>
     </table>
@@ -399,18 +447,23 @@ function ghodaghodi_dest_save_meta($post_id)
     if (!current_user_can('edit_post', $post_id)) return;
     if ('ghodaghodi_dest' !== get_post_type($post_id)) return;
 
-    $fields = ['destination_location', 'destination_best_time'];
-    foreach ($fields as $field) {
-        if (isset($_POST[$field])) {
-            update_post_meta($post_id, '_' . $field, sanitize_text_field($_POST[$field]));
-        }
+    if (isset($_POST['destination_location'])) {
+        update_post_meta($post_id, '_destination_location', sanitize_text_field($_POST['destination_location']));
     }
 
-    $seasons = ['spring', 'summer', 'autumn', 'winter', 'all_year'];
-    if (isset($_POST['destination_season']) && in_array($_POST['destination_season'], $seasons, true)) {
-        update_post_meta($post_id, '_destination_season', sanitize_text_field($_POST['destination_season']));
+    $peak_months = isset($_POST['destination_btv_peak_months']) ? sanitize_text_field(wp_unslash($_POST['destination_btv_peak_months'])) : '';
+    $seasons     = isset($_POST['destination_btv_seasons']) ? sanitize_text_field(wp_unslash($_POST['destination_btv_seasons'])) : '';
+    $why         = isset($_POST['destination_btv_why']) ? sanitize_textarea_field(wp_unslash($_POST['destination_btv_why'])) : '';
+
+    if ($peak_months || $seasons || $why) {
+        $months = array_values(array_filter(array_map('trim', explode(',', $peak_months))));
+        update_post_meta($post_id, '_destination_best_time_to_visit', wp_json_encode([
+            'peak_months'    => $months,
+            'seasons'        => $seasons,
+            'why_visit_then' => $why,
+        ], JSON_UNESCAPED_UNICODE));
     } else {
-        delete_post_meta($post_id, '_destination_season');
+        delete_post_meta($post_id, '_destination_best_time_to_visit');
     }
 }
 add_action('save_post', 'ghodaghodi_dest_save_meta');
@@ -524,7 +577,6 @@ function ghodaghodi_trek_meta_callback($post)
     $pack        = get_post_meta($post->ID, '_destination_what_to_pack', true);
     $tips        = get_post_meta($post->ID, '_destination_trek_tips', true);
     $region      = get_post_meta($post->ID, '_destination_region', true);
-    $best_season = get_post_meta($post->ID, '_destination_best_season', true);
     $why_choose  = get_post_meta($post->ID, '_destination_why_choose', true);
     $trek_map    = get_post_meta($post->ID, '_destination_trek_map', true);
     $highlights  = json_decode(get_post_meta($post->ID, '_destination_highlights', true), true);
@@ -624,15 +676,6 @@ function ghodaghodi_trek_meta_callback($post)
             <td>
                 <input type="text" id="destination_region" name="destination_region" value="<?php echo esc_attr($region); ?>" class="regular-text" placeholder="<?php _e('E.g.: Bajura, Nepal', 'ghodaghodi-view'); ?>" />
                 <p class="description"><?php _e('Geographic region where the trek is located', 'ghodaghodi-view'); ?></p>
-            </td>
-        </tr>
-        <tr>
-            <th scope="row">
-                <label for="destination_best_season"><?php _e('Best Season', 'ghodaghodi-view'); ?></label>
-            </th>
-            <td>
-                <input type="text" id="destination_best_season" name="destination_best_season" value="<?php echo esc_attr($best_season); ?>" class="regular-text" placeholder="<?php _e('E.g.: Spring & Autumn', 'ghodaghodi-view'); ?>" />
-                <p class="description"><?php _e('Best seasons for this trek', 'ghodaghodi-view'); ?></p>
             </td>
         </tr>
         <tr>
@@ -976,10 +1019,6 @@ function ghodaghodi_trek_save_meta($post_id)
 
     if (isset($_POST['destination_region'])) {
         update_post_meta($post_id, '_destination_region', sanitize_text_field(wp_unslash($_POST['destination_region'])));
-    }
-
-    if (isset($_POST['destination_best_season'])) {
-        update_post_meta($post_id, '_destination_best_season', sanitize_text_field(wp_unslash($_POST['destination_best_season'])));
     }
 
     if (isset($_POST['destination_why_choose'])) {

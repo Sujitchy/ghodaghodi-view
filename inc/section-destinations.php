@@ -22,8 +22,7 @@
                 $categories = get_the_category();
                 $cat_name   = !empty($categories) ? $categories[0]->name : __('गन्तव्य', 'ghodaghodi-view');
                 $location   = get_post_meta(get_the_ID(), '_destination_location', true);
-                $best_time  = get_post_meta(get_the_ID(), '_destination_best_time', true);
-                $season     = get_post_meta(get_the_ID(), '_destination_season', true);
+                $best_time  = ghodaghodi_get_best_time_to_visit(get_the_ID());
                 $duration   = get_post_meta(get_the_ID(), '_destination_trek_duration', true);
                 $elevation  = get_post_meta(get_the_ID(), '_destination_trek_max_elevation', true);
                 $difficulty = (int) get_post_meta(get_the_ID(), '_destination_trek_difficulty', true);
@@ -71,10 +70,10 @@
                         </p>
                         <div class="flex justify-between items-center pt-3 border-t border-gray-100 text-xs text-gray-500">
                             <div class="flex flex-wrap items-center gap-3">
-                                <?php if ($season): ?>
-                                    <span><i class="fa-solid fa-calendar-days text-amber-500"></i> <?php echo esc_html($season); ?></span>
+                                <?php if ($best_time['seasons']): ?>
+                                    <span><i class="fa-solid fa-calendar-days text-amber-500"></i> <?php echo esc_html($best_time['seasons']); ?></span>
                                 <?php endif; ?>
-                                <span><i class="fa-regular fa-clock"></i> <?php echo $best_time ? esc_html($best_time) : __('बाह्रै महिना', 'ghodaghodi-view'); ?></span>
+                                <span><i class="fa-regular fa-clock"></i> <?php echo $best_time['peak_months'] ? esc_html(implode(', ', $best_time['peak_months'])) : __('बाह्रै महिना', 'ghodaghodi-view'); ?></span>
                             </div>
                             <a href="<?php the_permalink(); ?>" class="text-emerald-700 font-semibold hover:text-amber-600 transition">
                                 <?php _e('विस्तृतमा हेर्नुहोस्', 'ghodaghodi-view'); ?> <i class="fa-solid fa-arrow-right"></i>
