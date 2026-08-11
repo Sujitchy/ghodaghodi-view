@@ -37,6 +37,8 @@ function ghodaghodi_scripts()
 
     wp_enqueue_style('ghodaghodi-tailwind', get_template_directory_uri() . '/assets/css/style.css', [], $theme->get('Version'));
 
+    wp_enqueue_style('ghodaghodi-fonts', 'https://fonts.googleapis.com/css2?family=Kameron:wght@400..700&family=Mukta:wght@300;400;600;700&family=Noto+Sans:ital,wght@0,100..900;1,100..900&display=swap', [], null);
+
     wp_enqueue_style('ghodaghodi-fontawesome', 'https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css', [], '6.4.0');
 
     wp_enqueue_script('ghodaghodi-script', get_template_directory_uri() . '/assets/js/theme.js', [], $theme->get('Version'), true);

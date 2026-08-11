@@ -6,10 +6,16 @@ module.exports = {
     'template-parts/**/*.php',
     'src/**/*.js',
   ],
+  safelist: [
+    'font-kameron',
+    'font-notosans',
+  ],
   theme: {
     extend: {
       fontFamily: {
         mukta: ['Mukta', 'sans-serif'],
+        kameron: ['Kameron', 'serif'],
+        notosans: ['Noto Sans', 'sans-serif'],
       },
       colors: {
         emerald: {
