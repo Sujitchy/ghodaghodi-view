@@ -20,6 +20,9 @@
         $trek_map    = get_post_meta(get_the_ID(), '_destination_trek_map', true);
         $highlights  = json_decode(get_post_meta(get_the_ID(), '_destination_highlights', true), true);
 
+        $itinerary   = ghodaghodi_decode_unicode($itinerary);
+        $highlights  = ghodaghodi_decode_unicode($highlights);
+
         $itinerary   = is_array($itinerary) ? $itinerary : [];
         $highlights  = is_array($highlights) ? $highlights : [];
         $pack_items  = $pack ? array_values(array_filter(array_map('trim', explode(',', $pack)))) : [];

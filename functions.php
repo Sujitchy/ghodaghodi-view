@@ -413,6 +413,92 @@ function ghodaghodi_dest_save_meta($post_id)
 }
 add_action('save_post', 'ghodaghodi_dest_save_meta');
 
+/**
+ * Decode literal Unicode escape sequences back into real UTF-8 text.
+ *
+ * Handles both formats that may be stored in post meta:
+ *   - "\u0927\u0928..."  (backslash preserved, valid JSON escapes)
+ *   - "u0927u0928..."    (backslash stripped during a past double-unescape)
+ *
+ * The bare "uXXXX" form is only decoded when it is not preceded by a non-hex
+ * Latin letter (g-z, G-Z), so ordinary English words such as "reduced" are
+ * never touched while consecutive "uXXXX" runs still decode fully (their
+ * continuation groups are preceded by hex digits/letters). Non-hex or invalid
+ * sequences are left untouched so existing English text and already-correct
+ * Nepali text pass through unchanged. The function is idempotent: decoded
+ * UTF-8 text contains no "uXXXX" sequences, so it is safe to call on data
+ * that is already correct.
+ */
+function ghodaghodi_decode_unicode($value)
+{
+    if (is_array($value)) {
+        return array_map('ghodaghodi_decode_unicode', $value);
+    }
+
+    if (!is_string($value)) {
+        return $value;
+    }
+
+    return preg_replace_callback('/(?<![g-zG-Z])(?:\\\\u|u)([0-9a-fA-F]{4})/', function ($match) {
+        $codepoint = hexdec($match[1]);
+
+        if ($codepoint < 0x20 || ($codepoint >= 0xD800 && $codepoint <= 0xDFFF) || $codepoint > 0x10FFFF) {
+            return $match[0];
+        }
+
+        if ($codepoint <= 0x7F) {
+            return chr($codepoint);
+        }
+
+        if ($codepoint <= 0x7FF) {
+            return chr(0xC0 | ($codepoint >> 6)) . chr(0x80 | ($codepoint & 0x3F));
+        }
+
+        if ($codepoint <= 0xFFFF) {
+            return chr(0xE0 | ($codepoint >> 12)) . chr(0x80 | (($codepoint >> 6) & 0x3F)) . chr(0x80 | ($codepoint & 0x3F));
+        }
+
+        return chr(0xF0 | ($codepoint >> 18)) . chr(0x80 | (($codepoint >> 12) & 0x3F)) . chr(0x80 | (($codepoint >> 6) & 0x3F)) . chr(0x80 | ($codepoint & 0x3F));
+    }, $value);
+}
+
+/**
+ * Repair itinerary/highlight meta values that were stored with literal
+ * Unicode escape sequences instead of real UTF-8 characters.
+ *
+ * Instead of a one-time option (which can run before all damaged rows exist),
+ * this re-scans on every admin_init and repairs whenever damage is detected,
+ * so the stored data self-heals. The data is decoded exactly once and
+ * re-stored as real UTF-8 using JSON_UNESCAPED_UNICODE.
+ */
+function ghodaghodi_repair_unicode_meta()
+{
+    global $wpdb;
+
+    $rows = $wpdb->get_results(
+        $wpdb->prepare(
+            "SELECT post_id, meta_key, meta_value FROM {$wpdb->postmeta}
+             WHERE meta_key IN ('_destination_trek_itinerary', '_destination_highlights')
+               AND meta_value REGEXP %s",
+            '(^|[^\\\\])u[0-9a-fA-F]{4}'
+        )
+    );
+
+    if (!$rows) {
+        return;
+    }
+
+    foreach ($rows as $row) {
+        $decoded = ghodaghodi_decode_unicode($row->meta_value);
+        $value   = json_decode($decoded, true);
+
+        if (is_array($value)) {
+            update_post_meta($row->post_id, $row->meta_key, wp_json_encode(array_values($value), JSON_UNESCAPED_UNICODE));
+        }
+    }
+}
+add_action('admin_init', 'ghodaghodi_repair_unicode_meta');
+
 function ghodaghodi_trek_add_meta_boxes($post)
 {
     if ('ghodaghodi_dest' !== get_post_type($post)) {
@@ -440,6 +526,9 @@ function ghodaghodi_trek_meta_callback($post)
     $why_choose  = get_post_meta($post->ID, '_destination_why_choose', true);
     $trek_map    = get_post_meta($post->ID, '_destination_trek_map', true);
     $highlights  = json_decode(get_post_meta($post->ID, '_destination_highlights', true), true);
+
+    $itinerary   = ghodaghodi_decode_unicode($itinerary);
+    $highlights  = ghodaghodi_decode_unicode($highlights);
 
     if (!is_array($itinerary)) {
         $itinerary = [];
@@ -872,7 +961,7 @@ function ghodaghodi_trek_save_meta($post_id)
             return $day['day'] !== '' || $day['title'] !== '';
         }));
 
-        update_post_meta($post_id, '_destination_trek_itinerary', wp_json_encode($days));
+        update_post_meta($post_id, '_destination_trek_itinerary', wp_json_encode($days, JSON_UNESCAPED_UNICODE));
     }
 
     if (isset($_POST['destination_what_to_pack'])) {
@@ -919,7 +1008,7 @@ function ghodaghodi_trek_save_meta($post_id)
             }
         }
 
-        update_post_meta($post_id, '_destination_highlights', wp_json_encode(array_values($highlights)));
+        update_post_meta($post_id, '_destination_highlights', wp_json_encode(array_values($highlights), JSON_UNESCAPED_UNICODE));
     }
 }
 add_action('save_post', 'ghodaghodi_trek_save_meta');
