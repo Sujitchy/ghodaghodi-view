@@ -193,3 +193,7 @@ body {
 .logo:hover {
     color: #FFD700;
 }
+
+.mr-2\.5 {
+    margin-right: 10px;
+}

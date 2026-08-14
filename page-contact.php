@@ -33,7 +33,7 @@ $contact_bg = get_template_directory_uri() . '/assets/images/banner.jpg';
         <aside class="space-y-6">
             <div class="bg-white rounded-xl shadow-sm border border-gray-100 p-6">
                 <h2 class="text-lg font-bold text-gray-900 mb-4">
-                    <i class="fa-solid fa-location-dot text-emerald-600 mr-2"></i><?php _e('ठेगाना', 'ghodaghodi-view'); ?>
+                    <i class="fa-solid fa-location-dot text-emerald-600 mr-2.5"></i><?php _e('ठेगाना', 'ghodaghodi-view'); ?>
                 </h2>
                 <p class="text-sm text-gray-600 leading-relaxed">
                     <?php echo esc_html(get_theme_mod('ghodaghodi_contact_address', __('घोडाघोडी नगरपालिका, कैलाली जिल्ला, सुदूरपश्चिम प्रदेश, नेपाल', 'ghodaghodi-view'))); ?>
@@ -42,7 +42,7 @@ $contact_bg = get_template_directory_uri() . '/assets/images/banner.jpg';
 
             <div class="bg-white rounded-xl shadow-sm border border-gray-100 p-6">
                 <h2 class="text-lg font-bold text-gray-900 mb-4">
-                    <i class="fa-solid fa-phone text-emerald-600 mr-2"></i><?php _e('फोन', 'ghodaghodi-view'); ?>
+                    <i class="fa-solid fa-phone text-emerald-600 mr-2.5"></i><?php _e('फोन', 'ghodaghodi-view'); ?>
                 </h2>
                 <p class="text-sm text-gray-600">
                     <a href="tel:<?php echo esc_attr(preg_replace('/\s+/', '', get_theme_mod('ghodaghodi_contact_phone', ''))); ?>" class="hover:text-emerald-700">
@@ -53,7 +53,7 @@ $contact_bg = get_template_directory_uri() . '/assets/images/banner.jpg';
 
             <div class="bg-white rounded-xl shadow-sm border border-gray-100 p-6">
                 <h2 class="text-lg font-bold text-gray-900 mb-4">
-                    <i class="fa-solid fa-envelope text-emerald-600 mr-2"></i><?php _e('इमेल', 'ghodaghodi-view'); ?>
+                    <i class="fa-solid fa-envelope text-emerald-600 mr-2.5"></i><?php _e('इमेल', 'ghodaghodi-view'); ?>
                 </h2>
                 <p class="text-sm text-gray-600">
                     <a href="mailto:<?php echo esc_attr(get_theme_mod('ghodaghodi_contact_email', '')); ?>" class="hover:text-emerald-700">
@@ -64,7 +64,7 @@ $contact_bg = get_template_directory_uri() . '/assets/images/banner.jpg';
 
             <div class="bg-white rounded-xl shadow-sm border border-gray-100 p-6">
                 <h2 class="text-lg font-bold text-gray-900 mb-4">
-                    <i class="fa-solid fa-clock text-emerald-600 mr-2"></i><?php _e('खुल्ने समय', 'ghodaghodi-view'); ?>
+                    <i class="fa-solid fa-clock text-emerald-600 mr-2.5"></i><?php _e('खुल्ने समय', 'ghodaghodi-view'); ?>
                 </h2>
                 <p class="text-sm text-gray-600 leading-relaxed">
                     <?php echo esc_html(get_theme_mod('ghodaghodi_contact_hours', __('आइतबार – शुक्रबार: बिहान १० – साँझ ५', 'ghodaghodi-view'))); ?>
