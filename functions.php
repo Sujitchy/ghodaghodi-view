@@ -422,7 +422,7 @@ function ghodaghodi_dest_meta_callback($post)
                 <p>
                     <label for="destination_btv_peak_months" style="font-weight:600;"><?php _e('Peak Months', 'ghodaghodi-view'); ?></label>
                     <input type="text" id="destination_btv_peak_months" name="destination_btv_peak_months" value="<?php echo esc_attr($peak_months); ?>" class="regular-text" placeholder="<?php _e('E.g.: Sept, Oct, Nov, Feb, Mar, Apr', 'ghodaghodi-view'); ?>" />
-                    <span class="description"><?php _e('Comma-separated peak travel months', 'ghodaghodi-view'); ?></span>
+
                 </p>
                 <p>
                     <label for="destination_btv_seasons" style="font-weight:600;"><?php _e('Seasons', 'ghodaghodi-view'); ?></label>
@@ -829,9 +829,13 @@ function ghodaghodi_trek_meta_callback($post)
                     e.preventDefault();
                     var frame = wp.media({
                         title: '<?php echo esc_js(__('Select Highlight Image', 'ghodaghodi-view')); ?>',
-                        button: { text: '<?php echo esc_js(__('Use this image', 'ghodaghodi-view')); ?>' },
+                        button: {
+                            text: '<?php echo esc_js(__('Use this image', 'ghodaghodi-view')); ?>'
+                        },
                         multiple: false,
-                        library: { type: 'image' }
+                        library: {
+                            type: 'image'
+                        }
                     });
                     frame.on('select', function() {
                         var attachment = frame.state().get('selection').first().toJSON();
@@ -875,9 +879,13 @@ function ghodaghodi_trek_meta_callback($post)
                 e.preventDefault();
                 var frame = wp.media({
                     title: '<?php echo esc_js(__('Select Route Map Image', 'ghodaghodi-view')); ?>',
-                    button: { text: '<?php echo esc_js(__('Use this image', 'ghodaghodi-view')); ?>' },
+                    button: {
+                        text: '<?php echo esc_js(__('Use this image', 'ghodaghodi-view')); ?>'
+                    },
                     multiple: false,
-                    library: { type: 'image' }
+                    library: {
+                        type: 'image'
+                    }
                 });
                 frame.on('select', function() {
                     var attachment = frame.state().get('selection').first().toJSON();
@@ -1104,6 +1112,45 @@ function ghodaghodi_save_user_social_fields($user_id)
 }
 add_action('personal_options_update', 'ghodaghodi_save_user_social_fields');
 add_action('edit_user_profile_update', 'ghodaghodi_save_user_social_fields');
+
+function ghodaghodi_contact_submit()
+{
+    $redirect = wp_get_referer() ?: home_url('/');
+
+    if (!isset($_POST['ghodaghodi_contact_nonce']) || !wp_verify_nonce($_POST['ghodaghodi_contact_nonce'], 'ghodaghodi_contact_form')) {
+        wp_safe_redirect(add_query_arg('contact_status', 'error', $redirect));
+        exit;
+    }
+
+    $name    = isset($_POST['cf_name']) ? sanitize_text_field(wp_unslash($_POST['cf_name'])) : '';
+    $email   = isset($_POST['cf_email']) ? sanitize_email(wp_unslash($_POST['cf_email'])) : '';
+    $subject = isset($_POST['cf_subject']) ? sanitize_text_field(wp_unslash($_POST['cf_subject'])) : '';
+    $message = isset($_POST['cf_message']) ? sanitize_textarea_field(wp_unslash($_POST['cf_message'])) : '';
+
+    if (empty($name) || empty($email) || empty($message) || !is_email($email)) {
+        wp_safe_redirect(add_query_arg('contact_status', 'error', $redirect));
+        exit;
+    }
+
+    $to = get_theme_mod('ghodaghodi_contact_email', get_option('admin_email'));
+
+    $body = sprintf(
+        __('नाम: %1$s' . "\n" . 'इमेल: %2$s' . "\n\n" . 'विषय: %3$s' . "\n\n" . 'सन्देश:' . "\n%4$s", 'ghodaghodi-view'),
+        $name,
+        $email,
+        $subject,
+        $message
+    );
+
+    $headers = ['Reply-To: ' . $name . ' <' . $email . '>'];
+
+    $sent = wp_mail($to, '[' . get_bloginfo('name') . '] ' . ($subject ?: __('नयाँ सन्देश', 'ghodaghodi-view')), $body, $headers);
+
+    wp_safe_redirect(add_query_arg('contact_status', $sent ? 'success' : 'error', $redirect));
+    exit;
+}
+add_action('admin_post_ghodaghodi_contact_submit', 'ghodaghodi_contact_submit');
+add_action('admin_post_nopriv_ghodaghodi_contact_submit', 'ghodaghodi_contact_submit');
 
 require_once get_template_directory() . '/inc/template-tags.php';
 require_once get_template_directory() . '/inc/walker.php';

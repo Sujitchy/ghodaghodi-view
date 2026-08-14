@@ -40,12 +40,14 @@
                 ]);
             } else {
                 ?>
-<ul class="flex flex-col md:flex-row md:space-x-6">
+                <ul class="flex flex-col md:flex-row md:space-x-6">
                     <li><a href="#dashboard" class="block py-2 md:py-0 hover:text-[#FFD700] transition">ड्यासबोर्ड</a></li>
                     <li><a href="#destinations" class="block py-2 md:py-0 hover:text-[#FFD700] transition">गन्तव्यहरू</a></li>
                     <li><a href="#hotels" class="block py-2 md:py-0 hover:text-[#FFD700] transition">होटल तथा होमस्टे</a></li>
                     <li><a href="#blogs" class="block py-2 md:py-0 hover:text-[#FFD700] transition">ब्लग</a></li>
                     <li><a href="#qr-section" class="block py-2 md:py-0 hover:text-[#FFD700] transition">डिजिटल क्युआर</a></li>
+                    <li><a href="<?php echo esc_url(home_url('/about-us/')); ?>" class="block py-2 md:py-0 hover:text-[#FFD700] transition"><i class="fa-solid fa-circle-info mr-1.5"></i>हाम्रो बारेमा</a></li>
+                    <li><a href="<?php echo esc_url(home_url('/contact/')); ?>" class="block py-2 md:py-0 hover:text-[#FFD700] transition"><i class="fa-solid fa-envelope mr-1.5"></i>सम्पर्क</a></li>
                 </ul>
                 <?php
             }
