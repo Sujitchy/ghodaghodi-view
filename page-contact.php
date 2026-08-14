@@ -93,34 +93,33 @@ $contact_bg = get_template_directory_uri() . '/assets/images/banner.jpg';
                     <input type="hidden" name="action" value="ghodaghodi_contact_submit">
                     <?php wp_nonce_field('ghodaghodi_contact_form', 'ghodaghodi_contact_nonce'); ?>
 
-                    <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
-                        <div>
-                            <label for="cf-name" class="block text-sm font-semibold text-gray-700 mb-2"><?php _e('पूरा नाम', 'ghodaghodi-view'); ?> *</label>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div class="form-field">
+                            <label for="cf-name" class="block text-sm font-semibold text-gray-700"><?php _e('पूरा नाम', 'ghodaghodi-view'); ?> *</label>
                             <input type="text" id="cf-name" name="cf_name" required
                                    class="w-full border border-gray-300 rounded-lg px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500">
                         </div>
-                        <div>
-                            <label for="cf-email" class="block text-sm font-semibold text-gray-700 mb-2"><?php _e('इमेल', 'ghodaghodi-view'); ?> *</label>
+                        <div class="form-field">
+                            <label for="cf-email" class="block text-sm font-semibold text-gray-700"><?php _e('इमेल', 'ghodaghodi-view'); ?> *</label>
                             <input type="email" id="cf-email" name="cf_email" required
                                    class="w-full border border-gray-300 rounded-lg px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500">
                         </div>
                     </div>
 
-                    <div>
-                        <label for="cf-subject" class="block text-sm font-semibold text-gray-700 mb-2"><?php _e('विषय', 'ghodaghodi-view'); ?></label>
+                    <div class="form-field">
+                        <label for="cf-subject" class="block text-sm font-semibold text-gray-700"><?php _e('विषय', 'ghodaghodi-view'); ?></label>
                         <input type="text" id="cf-subject" name="cf_subject"
                                class="w-full border border-gray-300 rounded-lg px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500">
                     </div>
 
-                    <div>
-                        <label for="cf-message" class="block text-sm font-semibold text-gray-700 mb-2"><?php _e('सन्देश', 'ghodaghodi-view'); ?> *</label>
+                    <div class="form-field">
+                        <label for="cf-message" class="block text-sm font-semibold text-gray-700"><?php _e('सन्देश', 'ghodaghodi-view'); ?> *</label>
                         <textarea id="cf-message" name="cf_message" rows="6" required
                                   class="w-full border border-gray-300 rounded-lg px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500"></textarea>
                     </div>
 
-                    <button type="submit"
-                            class="bg-emerald-600 hover:bg-emerald-700 text-white font-bold px-6 py-3 rounded-lg transition">
-                        <i class="fa-solid fa-paper-plane mr-2"></i><?php _e('सन्देश पठाउनुहोस्', 'ghodaghodi-view'); ?>
+                    <button type="submit" class="submit-btn bg-emerald-600 hover:bg-emerald-700 text-white font-bold px-6 py-3 rounded-lg transition">
+                        <i class="fa-solid fa-paper-plane"></i><?php _e('सन्देश पठाउनुहोस्', 'ghodaghodi-view'); ?>
                     </button>
                 </form>
             </div>

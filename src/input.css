@@ -197,3 +197,22 @@ body {
 .mr-2\.5 {
     margin-right: 10px;
 }
+
+#contact-form .form-field {
+    margin-bottom: 8px;
+}
+
+#contact-form .form-field > label {
+    display: block;
+    margin-bottom: 8px;
+}
+
+#contact-form .submit-btn {
+    margin-top: 20px;
+    display: inline-flex;
+    align-items: center;
+}
+
+#contact-form .submit-btn i {
+    margin-right: 8px;
+}
