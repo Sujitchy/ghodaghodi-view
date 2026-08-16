@@ -189,6 +189,58 @@ function ghodaghodi_register_destination_post_type()
 }
 add_action('init', 'ghodaghodi_register_destination_post_type');
 
+function ghodaghodi_register_categories()
+{
+    register_taxonomy('ghodaghodi_dest_cat', 'ghodaghodi_dest', [
+        'labels' => [
+            'name'              => __('Destination Categories', 'ghodaghodi-view'),
+            'singular_name'     => __('Destination Category', 'ghodaghodi-view'),
+            'search_items'      => __('Search Destination Categories', 'ghodaghodi-view'),
+            'all_items'         => __('All Destination Categories', 'ghodaghodi-view'),
+            'parent_item'       => __('Parent Destination Category', 'ghodaghodi-view'),
+            'parent_item_colon' => __('Parent Destination Category:', 'ghodaghodi-view'),
+            'edit_item'         => __('Edit Destination Category', 'ghodaghodi-view'),
+            'update_item'       => __('Update Destination Category', 'ghodaghodi-view'),
+            'add_new_item'      => __('Add New Destination Category', 'ghodaghodi-view'),
+            'new_item_name'     => __('New Destination Category Name', 'ghodaghodi-view'),
+            'menu_name'         => __('Categories', 'ghodaghodi-view'),
+        ],
+        'public'            => true,
+        'hierarchical'      => true,
+        'show_ui'           => true,
+        'show_in_menu'      => true,
+        'show_admin_column' => true,
+        'query_var'         => true,
+        'rewrite'           => ['slug' => 'destination-category', 'with_front' => false],
+        'show_in_rest'      => false,
+    ]);
+
+    register_taxonomy('ghodaghodi_hotel_cat', 'ghodaghodi_hotel', [
+        'labels' => [
+            'name'              => __('Hotel Categories', 'ghodaghodi-view'),
+            'singular_name'     => __('Hotel Category', 'ghodaghodi-view'),
+            'search_items'      => __('Search Hotel Categories', 'ghodaghodi-view'),
+            'all_items'         => __('All Hotel Categories', 'ghodaghodi-view'),
+            'parent_item'       => __('Parent Hotel Category', 'ghodaghodi-view'),
+            'parent_item_colon' => __('Parent Hotel Category:', 'ghodaghodi-view'),
+            'edit_item'         => __('Edit Hotel Category', 'ghodaghodi-view'),
+            'update_item'       => __('Update Hotel Category', 'ghodaghodi-view'),
+            'add_new_item'      => __('Add New Hotel Category', 'ghodaghodi-view'),
+            'new_item_name'     => __('New Hotel Category Name', 'ghodaghodi-view'),
+            'menu_name'         => __('Categories', 'ghodaghodi-view'),
+        ],
+        'public'            => true,
+        'hierarchical'      => true,
+        'show_ui'           => true,
+        'show_in_menu'      => true,
+        'show_admin_column' => true,
+        'query_var'         => true,
+        'rewrite'           => ['slug' => 'hotel-category', 'with_front' => false],
+        'show_in_rest'      => false,
+    ]);
+}
+add_action('init', 'ghodaghodi_register_categories');
+
 add_filter('use_block_editor_for_post_type', function ($enabled, $post_type) {
     if ('ghodaghodi_hotel' === $post_type || 'ghodaghodi_dest' === $post_type) {
         return false;

@@ -147,3 +147,42 @@ document.addEventListener('DOMContentLoaded', function () {
         });
     });
 });
+
+document.addEventListener('DOMContentLoaded', function () {
+    document.querySelectorAll('.gh-filter-bar').forEach(function (bar) {
+        var selector = bar.getAttribute('data-target');
+        if (!selector) return;
+
+        var items = document.querySelectorAll(selector);
+        var chips = bar.querySelectorAll('.gh-filter-chip');
+        var emptyId = bar.getAttribute('data-empty-msg');
+        var emptyEl = emptyId ? document.getElementById(emptyId) : null;
+
+        chips.forEach(function (chip) {
+            chip.addEventListener('click', function () {
+                var filter = chip.getAttribute('data-filter');
+
+                chips.forEach(function (c) {
+                    c.classList.toggle('active', c === chip);
+                });
+
+                var visible = 0;
+                items.forEach(function (item) {
+                    var show = false;
+                    if (filter === 'all') {
+                        show = true;
+                    } else {
+                        var cats = (item.getAttribute('data-category') || '').split(' ');
+                        show = cats.indexOf(filter) !== -1;
+                    }
+                    item.classList.toggle('gh-hidden', !show);
+                    if (show) visible++;
+                });
+
+                if (emptyEl) {
+                    emptyEl.classList.toggle('gh-hidden', visible > 0);
+                }
+            });
+        });
+    });
+});

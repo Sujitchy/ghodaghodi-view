@@ -1,5 +1,5 @@
 <?php get_header(); ?>
-<?php get_template_part('inc/section', 'hero') ?>
+<?php get_template_part('inc/section', 'hero-slider') ?>
 <?php get_template_part('inc/section', 'highlights') ?>
 
 

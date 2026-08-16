@@ -7,9 +7,24 @@
         <p class="text-sm text-gray-500 mt-1"><?php _e('स्थलगत प्राविधिकहरूबाट प्रमाणित आवासहरूको विवरण', 'ghodaghodi-view'); ?></p>
     </div>
 
+    <?php
+    $hotel_terms = get_terms([
+        'taxonomy'   => 'ghodaghodi_hotel_cat',
+        'hide_empty' => true,
+    ]);
+    if (!is_wp_error($hotel_terms) && !empty($hotel_terms)):
+    ?>
+    <div class="gh-filter-bar mb-6" data-target="#gh-hotel-table tbody tr.gh-hotel-row" data-empty-msg="gh-hotel-empty">
+        <button type="button" class="gh-filter-chip active" data-filter="all"><?php _e('सबै', 'ghodaghodi-view'); ?></button>
+        <?php foreach ($hotel_terms as $hotel_term): ?>
+        <button type="button" class="gh-filter-chip" data-filter="<?php echo esc_attr($hotel_term->slug); ?>"><?php echo esc_html($hotel_term->name); ?></button>
+        <?php endforeach; ?>
+    </div>
+    <?php endif; ?>
+
     <div class="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden">
         <div class="overflow-x-auto">
-            <table class="w-full text-left border-collapse text-sm gh-hotel-table">
+            <table id="gh-hotel-table" class="w-full text-left border-collapse text-sm gh-hotel-table">
                 <thead>
                     <tr class="bg-emerald-900 text-white text-xs font-semibold uppercase">
                         <th class="gh-col-name"><?php _e('आवासको नाम', 'ghodaghodi-view'); ?></th>
@@ -30,6 +45,8 @@
 
                     if ($hotels->have_posts()):
                         while ($hotels->have_posts()): $hotels->the_post();
+                            $h_cat_terms = wp_get_post_terms(get_the_ID(), 'ghodaghodi_hotel_cat');
+                            $h_cat_slugs = !empty($h_cat_terms) && !is_wp_error($h_cat_terms) ? wp_list_pluck($h_cat_terms, 'slug') : [];
                             $h_type     = get_post_meta(get_the_ID(), '_hotel_type', true) ?: __('होमस्टे', 'ghodaghodi-view');
                             $h_location = get_post_meta(get_the_ID(), '_hotel_location', true);
                             $h_beds     = get_post_meta(get_the_ID(), '_hotel_beds', true);
@@ -50,7 +67,7 @@
                                 $badge_class  = 'gh-badge-temp-closed';
                             }
                     ?>
-                            <tr class="hover:bg-gray-50">
+                            <tr class="hover:bg-gray-50 gh-hotel-row" data-category="<?php echo esc_attr(implode(' ', $h_cat_slugs)); ?>">
                                 <td class="gh-cell-name">
                                     <a href="<?php the_permalink(); ?>" class="hover:text-emerald-700 transition font-bold text-gray-900"><?php the_title(); ?></a>
                                 </td>
@@ -71,7 +88,7 @@
                         wp_reset_postdata();
                     else:
                         ?>
-                        <tr>
+                        <tr id="gh-hotel-empty">
                             <td colspan="5" class="p-4 text-center text-gray-500">
                                 <?php _e('होटल वा होमस्टे सूची उपलब्ध छैन।', 'ghodaghodi-view'); ?>
                             </td>

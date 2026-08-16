@@ -9,25 +9,41 @@
         </div>
     </div>
 
-    <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+    <?php
+    $dest_terms = get_terms([
+        'taxonomy'   => 'ghodaghodi_dest_cat',
+        'hide_empty' => true,
+    ]);
+    if (!is_wp_error($dest_terms) && !empty($dest_terms)):
+    ?>
+    <div class="gh-filter-bar mb-6" data-target="#gh-dest-grid > .gh-dest-card" data-empty-msg="gh-dest-empty">
+        <button type="button" class="gh-filter-chip active" data-filter="all"><?php _e('सबै', 'ghodaghodi-view'); ?></button>
+        <?php foreach ($dest_terms as $dest_term): ?>
+        <button type="button" class="gh-filter-chip" data-filter="<?php echo esc_attr($dest_term->slug); ?>"><?php echo esc_html($dest_term->name); ?></button>
+        <?php endforeach; ?>
+    </div>
+    <?php endif; ?>
+
+    <div id="gh-dest-grid" class="grid grid-cols-1 md:grid-cols-3 gap-6">
         <?php
         $destinations = new WP_Query([
             'post_type'      => 'ghodaghodi_dest',
-            'posts_per_page' => 3,
+            'posts_per_page' => -1,
             'meta_key'       => '_thumbnail_id',
         ]);
 
         if ($destinations->have_posts()):
             while ($destinations->have_posts()): $destinations->the_post();
-                $categories = get_the_category();
-                $cat_name   = !empty($categories) ? $categories[0]->name : __('गन्तव्य', 'ghodaghodi-view');
+                $cat_terms  = wp_get_post_terms(get_the_ID(), 'ghodaghodi_dest_cat');
+                $cat_name   = !empty($cat_terms) && !is_wp_error($cat_terms) ? $cat_terms[0]->name : __('गन्तव्य', 'ghodaghodi-view');
+                $cat_slugs  = !empty($cat_terms) && !is_wp_error($cat_terms) ? wp_list_pluck($cat_terms, 'slug') : [];
                 $location   = get_post_meta(get_the_ID(), '_destination_location', true);
                 $best_time  = ghodaghodi_get_best_time_to_visit(get_the_ID());
                 $duration   = get_post_meta(get_the_ID(), '_destination_trek_duration', true);
                 $elevation  = get_post_meta(get_the_ID(), '_destination_trek_max_elevation', true);
                 $difficulty = (int) get_post_meta(get_the_ID(), '_destination_trek_difficulty', true);
         ?>
-                <div class="bg-white rounded-xl shadow-sm overflow-hidden border border-gray-100 hover:shadow-md transition">
+                <div class="bg-white rounded-xl shadow-sm overflow-hidden border border-gray-100 hover:shadow-md transition gh-dest-card" data-category="<?php echo esc_attr(implode(' ', $cat_slugs)); ?>">
                     <div class="h-48 bg-gray-200 relative overflow-hidden">
                         <?php if (has_post_thumbnail()): ?>
                             <?php the_post_thumbnail('medium_large', ['class' => 'w-full h-full object-cover', 'alt' => get_the_title()]); ?>
@@ -86,7 +102,7 @@
             wp_reset_postdata();
         else:
             ?>
-            <div class="col-span-full text-center py-12 text-gray-500">
+            <div id="gh-dest-empty" class="col-span-full text-center py-12 text-gray-500">
                 <i class="fa-solid fa-map-location-dot text-4xl mb-4 block text-gray-300"></i>
                 <p><?php _e('कुनै गन्तव्यहरू उपलब्ध छैनन्। कृपया "destinations" श्रेणीमा पोष्टहरू थप्नुहोस्।', 'ghodaghodi-view'); ?></p>
             </div>

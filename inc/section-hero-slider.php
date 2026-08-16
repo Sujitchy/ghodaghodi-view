@@ -43,14 +43,6 @@
         <?php $i++; endwhile; wp_reset_postdata(); ?>
     </div>
 
-    <?php if ($total > 1): ?>
-    <div class="hero-slider-dots absolute bottom-6 left-1/2 -translate-x-1/2 flex gap-2 z-10">
-        <?php for ($d = 0; $d < $total; $d++): ?>
-        <button class="hero-slider-dot <?php echo $d === 0 ? 'active' : ''; ?>" data-index="<?php echo $d; ?>" aria-label="<?php printf(__('Go to slide %d', 'ghodaghodi-view'), $d + 1); ?>"></button>
-        <?php endfor; ?>
-    </div>
-    <?php endif; ?>
-
     <?php else: ?>
     <div class="py-20 px-4 text-center">
         <div class="absolute inset-0 opacity-20 bg-cover bg-center" style="background-image: url('<?php echo esc_url(get_theme_mod('ghodaghodi_hero_bg', 'https://images.unsplash.com/photo-1507525428034-b723cf961d3e?auto=format&fit=crop&w=1200&q=80')); ?>');"></div>

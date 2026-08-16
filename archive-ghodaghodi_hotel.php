@@ -10,17 +10,34 @@
         </p>
     </header>
 
+    <?php
+    $hotel_terms = get_terms([
+        'taxonomy'   => 'ghodaghodi_hotel_cat',
+        'hide_empty' => true,
+    ]);
+    if (!is_wp_error($hotel_terms) && !empty($hotel_terms)):
+    ?>
+    <div class="gh-filter-bar mb-6" data-target="#gh-hotel-archive-grid > article" data-empty-msg="gh-hotel-archive-empty">
+        <button type="button" class="gh-filter-chip active" data-filter="all"><?php _e('सबै', 'ghodaghodi-view'); ?></button>
+        <?php foreach ($hotel_terms as $hotel_term): ?>
+        <button type="button" class="gh-filter-chip" data-filter="<?php echo esc_attr($hotel_term->slug); ?>"><?php echo esc_html($hotel_term->name); ?></button>
+        <?php endforeach; ?>
+    </div>
+    <?php endif; ?>
+
     <?php if (have_posts()): ?>
-    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+    <div id="gh-hotel-archive-grid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
         <?php
         while (have_posts()):
             the_post();
+            $h_cat_terms = wp_get_post_terms(get_the_ID(), 'ghodaghodi_hotel_cat');
+            $h_cat_slugs = !empty($h_cat_terms) && !is_wp_error($h_cat_terms) ? wp_list_pluck($h_cat_terms, 'slug') : [];
             $h_type     = get_post_meta(get_the_ID(), '_hotel_type', true);
             $h_location = get_post_meta(get_the_ID(), '_hotel_location', true);
             $h_beds     = get_post_meta(get_the_ID(), '_hotel_beds', true);
             $h_status   = get_post_meta(get_the_ID(), '_hotel_status', true);
         ?>
-        <article id="post-<?php the_ID(); ?>" <?php post_class('bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden hover:shadow-md transition'); ?>>
+        <article id="post-<?php the_ID(); ?>" <?php post_class('bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden hover:shadow-md transition'); ?> data-category="<?php echo esc_attr(implode(' ', $h_cat_slugs)); ?>">
             <div class="h-48 bg-gray-200 relative overflow-hidden">
                 <a href="<?php the_permalink(); ?>">
                     <?php if (has_post_thumbnail()): ?>
@@ -67,6 +84,11 @@
             </div>
         </article>
         <?php endwhile; ?>
+    </div>
+
+    <div id="gh-hotel-archive-empty" class="gh-hidden text-center py-12 text-gray-500">
+        <i class="fa-solid fa-building text-4xl mb-4 block text-gray-300"></i>
+        <p><?php _e('यस श्रेणीमा होटल वा होमस्टे उपलब्ध छैनन्।', 'ghodaghodi-view'); ?></p>
     </div>
 
     <div class="mt-10">
