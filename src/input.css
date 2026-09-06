@@ -165,12 +165,21 @@ body {
     padding-bottom: 0;
 }
 
-.site-header.scrolled {
+.site-header.header-scrolled {
     background: rgba(6, 78, 59, 0.95);
     -webkit-backdrop-filter: blur(12px);
     backdrop-filter: blur(12px);
     box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
-    padding: 14px 0;
+}
+
+.site-header.header-scrolled .logo,
+.site-header.header-scrolled .logo i {
+    font-size: 20px;
+}
+
+.site-header.header-scrolled .custom-logo {
+    max-height: 42px;
+    width: auto;
 }
 
 .site-header nav ul li a {
@@ -178,6 +187,14 @@ body {
     font-size: 17px;
     text-decoration: none;
     transition: color 0.3s ease;
+}
+
+.site-header .custom-logo {
+    transition: max-height 0.28s ease;
+}
+
+.site-header .logo {
+    transition: font-size 0.28s ease;
 }
 
 .site-header nav ul li a:hover {
