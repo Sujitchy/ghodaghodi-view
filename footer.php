@@ -14,12 +14,12 @@
                         <?php endif; ?>
                     </a>
                     <p class="footer-about-text">
-                        <?php _e('Discover the natural beauty and cultural heritage of Ghodaghodi Nagarpalika. Your gateway to eco-tourism, homestays, and unforgettable experiences in western Nepal.', 'ghodaghodi-view'); ?>
+                        घोडाघोडी नगरपालिकाको प्राकृतिक सौन्दर्य र सांस्कृतिक सम्पदा पत्ता लगाउनुहोस्। पश्चिम नेपालमा इको-पर्यटन, होमस्टे र अविस्मरणीय अनुभवहरूको लागि तपाईंको प्रवेशद्वार।
                     </p>
                 </div>
 
                 <div class="footer-col">
-                    <h4 class="footer-heading"><?php _e('Quick Links', 'ghodaghodi-view'); ?></h4>
+                    <h4 class="footer-heading">द्रुत लिङ्कहरू</h4>
                     <ul class="footer-links">
                         <?php
                         if (has_nav_menu('footer')) {
@@ -34,11 +34,11 @@
                             ]);
                         } else {
                             ?>
-                            <li><a href="<?php echo esc_url(home_url('/')); ?>"><?php _e('Home', 'ghodaghodi-view'); ?></a></li>
-                            <li><a href="<?php echo esc_url(home_url('/destination/')); ?>"><?php _e('Destinations', 'ghodaghodi-view'); ?></a></li>
-                            <li><a href="<?php echo esc_url(home_url('/hotel/')); ?>"><?php _e('Hotels & Homestays', 'ghodaghodi-view'); ?></a></li>
-                            <li><a href="<?php echo esc_url(home_url('/about-us/')); ?>"><?php _e('About Us', 'ghodaghodi-view'); ?></a></li>
-                            <li><a href="<?php echo esc_url(home_url('/contact/')); ?>"><?php _e('Contact', 'ghodaghodi-view'); ?></a></li>
+                            <li><a href="<?php echo esc_url(home_url('/')); ?>">गृहपृष्ठ</a></li>
+                            <li><a href="<?php echo esc_url(home_url('/destination/')); ?>">गन्तव्यहरू</a></li>
+                            <li><a href="<?php echo esc_url(home_url('/hotel/')); ?>">होटल तथा होमस्टे</a></li>
+                            <li><a href="<?php echo esc_url(home_url('/about-us/')); ?>">हाम्रो बारेमा</a></li>
+                            <li><a href="<?php echo esc_url(home_url('/contact/')); ?>">सम्पर्क</a></li>
                             <?php
                         }
                         ?>
@@ -46,15 +46,15 @@
                 </div>
 
                 <div class="footer-col">
-                    <h4 class="footer-heading"><?php _e('Contact Info', 'ghodaghodi-view'); ?></h4>
+                    <h4 class="footer-heading">सम्पर्क जानकारी</h4>
                     <ul class="footer-contact">
                         <li>
                             <i class="fa-solid fa-location-dot"></i>
-                            <span><?php _e('Ghodaghodi Nagarpalika, Kailali, Nepal', 'ghodaghodi-view'); ?></span>
+                            <span>घोडाघोडी नगरपालिका, कैलाली, नेपाल</span>
                         </li>
                         <li>
                             <i class="fa-solid fa-phone"></i>
-                            <a href="tel:+977-01-5XXXXXX"><?php _e('+977-01-5XXXXXX', 'ghodaghodi-view'); ?></a>
+                            <a href="tel:+977-01-5XXXXXX">+977-01-5XXXXXX</a>
                         </li>
                         <li>
                             <i class="fa-solid fa-envelope"></i>
@@ -64,7 +64,7 @@
                 </div>
 
                 <div class="footer-col">
-                    <h4 class="footer-heading"><?php _e('Follow Us', 'ghodaghodi-view'); ?></h4>
+                    <h4 class="footer-heading">हामीलाई फलो गर्नुहोस्</h4>
                     <div class="footer-social">
                         <a href="#" target="_blank" rel="noopener" aria-label="Facebook">
                             <i class="fa-brands fa-facebook-f"></i>
@@ -92,10 +92,10 @@
                 <p>
                     &copy; <?php echo date('Y'); ?>
                     <?php bloginfo('name'); ?> &mdash;
-                    <?php _e('Tourism Development Department. All rights reserved.', 'ghodaghodi-view'); ?>
+                    पर्यटन विकास विभाग। सर्वाधिकार सुरक्षित।
                 </p>
                 <p class="footer-credit">
-                    <?php _e('Developed by', 'ghodaghodi-view'); ?>
+                    डिजाइन गरिएको
                     <a href="https://www.mohrain.com" target="_blank" rel="noopener">Mohrain</a>
                 </p>
             </div>
