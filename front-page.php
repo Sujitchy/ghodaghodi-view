@@ -7,6 +7,8 @@
     <?php get_template_part('inc/section', 'destinations') ?>
     <?php get_template_part('inc/section', 'gallery') ?>
 
+    <?php get_template_part('inc/section', 'chart') ?>
+
     <?php get_template_part('inc/section', 'hotels') ?>
 
     <?php get_template_part('inc/section', 'blogs') ?>

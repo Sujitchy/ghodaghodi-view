@@ -43,6 +43,11 @@ function ghodaghodi_scripts()
 
     wp_enqueue_script('ghodaghodi-script', get_template_directory_uri() . '/assets/js/theme.js', [], $theme->get('Version'), true);
 
+    if (is_front_page()) {
+        wp_enqueue_script('ghodaghodi-chartjs', get_template_directory_uri() . '/assets/js/chart.umd.min.js', [], '4.4.3', true);
+        wp_enqueue_script('ghodaghodi-bird-chart', get_template_directory_uri() . '/assets/js/bird-species-chart.js', ['ghodaghodi-chartjs'], $theme->get('Version'), true);
+    }
+
     if (is_singular() && comments_open() && get_option('thread_comments')) {
         wp_enqueue_script('comment-reply');
     }
