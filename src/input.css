@@ -269,6 +269,108 @@ body {
     display: none !important;
 }
 
+/* Chart legend & tooltip */
+.ghodaghodi-chart-legend {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px 18px;
+    margin-bottom: 12px;
+}
+
+.ghodaghodi-legend-item {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    background: none;
+    border: 0;
+    padding: 0;
+    cursor: pointer;
+    font-family: 'Mukta', 'Noto Sans', sans-serif;
+    font-size: 13px;
+    font-weight: 600;
+    color: #374151;
+    transition: color 0.2s ease, opacity 0.2s ease;
+}
+
+.ghodaghodi-legend-item:hover {
+    color: #059669;
+}
+
+.ghodaghodi-legend-dot {
+    width: 10px;
+    height: 10px;
+    border-radius: 9999px;
+    flex-shrink: 0;
+}
+
+.ghodaghodi-legend-sep {
+    color: #9ca3af;
+    font-weight: 400;
+}
+
+.ghodaghodi-legend-muted {
+    opacity: 0.35;
+}
+
+.ghodaghodi-chart-tooltip {
+    position: absolute;
+    z-index: 10;
+    max-width: 280px;
+    padding: 10px 12px;
+    border-radius: 10px;
+    background: rgba(2, 44, 34, 0.96);
+    border: 1px solid rgba(255, 255, 255, 0.12);
+    box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.3);
+    color: #ffffff;
+    font-family: 'Mukta', 'Noto Sans', sans-serif;
+    font-size: 13px;
+    line-height: 1.5;
+    pointer-events: none;
+    opacity: 0;
+    transition: opacity 0.15s ease;
+}
+
+.ghodaghodi-chart-tooltip .gh-tip-title {
+    color: #fbbf24;
+    font-weight: 700;
+    font-size: 14px;
+    margin-bottom: 4px;
+}
+
+.ghodaghodi-chart-tooltip .gh-tip-row {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    margin: 2px 0;
+}
+
+.ghodaghodi-chart-tooltip .gh-tip-dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    flex-shrink: 0;
+}
+
+.ghodaghodi-chart-tooltip .gh-tip-total {
+    margin-top: 6px;
+    padding-top: 6px;
+    border-top: 1px solid rgba(255, 255, 255, 0.15);
+    font-weight: 700;
+    font-size: 12px;
+}
+
+.ghodaghodi-chart-tooltip .gh-tip-total-en {
+    font-size: 11px;
+    color: #cbd5e1;
+}
+
+@media (max-width: 640px) {
+    .ghodaghodi-chart-tooltip {
+        max-width: 220px;
+        font-size: 12px;
+    }
+}
+
 /* Footer Styles */
 .site-footer {
     background: #064e3b;

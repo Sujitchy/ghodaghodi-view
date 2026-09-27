@@ -6,8 +6,13 @@
         </p>
     </div>
     <div class="bg-white p-4 rounded-xl shadow-inner flex flex-col items-center shrink-0">
-        <div class="w-32 h-32 bg-gray-100 rounded-lg flex items-center justify-center border-2 border-dashed border-gray-300">
-            <i class="fa-solid fa-qrcode text-6xl text-emerald-950"></i>
+        <div class="w-32 h-32 bg-gray-50 rounded-lg flex items-center justify-center border border-gray-200 overflow-hidden p-1">
+            <div class="qr-code-wrapper flex items-center justify-center w-full h-full">
+                <?php
+                // Using Kaya QR Code Generator shortcode format
+                echo do_shortcode('[kaya_qrcode content="Example string" size="120" eclevel="L"]');
+                ?>
+            </div>
         </div>
         <span class="text-[10px] text-gray-500 font-bold mt-2 tracking-wide uppercase"><?php _e('Scan to Test Profile', 'ghodaghodi-view'); ?></span>
     </div>

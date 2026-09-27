@@ -1,180 +1,226 @@
-document.addEventListener('DOMContentLoaded', function () {
-    var canvas = document.getElementById('ghodaghodi-bird-chart');
-    if (!canvas || typeof window.Chart === 'undefined') return;
+(function () {
+    'use strict';
 
-    var ctx = canvas.getContext('2d');
+    document.addEventListener('DOMContentLoaded', function () {
+        var canvas = document.getElementById('ghodaghodi-bird-chart');
+        if (!canvas || typeof window.Chart === 'undefined') return;
 
-    var gradient = ctx.createLinearGradient(0, 0, 0, canvas.parentNode.offsetHeight || 400);
-    gradient.addColorStop(0, 'rgba(5, 150, 105, 0.28)');
-    gradient.addColorStop(1, 'rgba(5, 150, 105, 0.02)');
+        var ctx = canvas.getContext('2d');
+        var wrapper = canvas.parentNode;
+        var legendEl = document.getElementById('ghodaghodi-chart-legend');
+        var tooltipEl = document.getElementById('ghodaghodi-chart-tooltip');
 
-    var months = ['बैशाख', 'जेठ', 'असार', 'साउन', 'भदौ', 'असोज', 'कात्तिक', 'मङ्सिर', 'पुस', 'माघ', 'फागुन', 'चैत'];
+        var fontFamily = "'Mukta', 'Noto Sans', sans-serif";
 
-    var wetland = [12, 13, 17, 18, 16, 15, 17, 20, 21, 20, 15, 12];
-    var forest = [6, 6, 8, 9, 8, 7, 9, 10, 11, 10, 8, 6];
+        var gradient = ctx.createLinearGradient(0, 0, 0, wrapper.offsetHeight || 400);
+        gradient.addColorStop(0, 'rgba(5, 150, 105, 0.28)');
+        gradient.addColorStop(1, 'rgba(5, 150, 105, 0.02)');
 
-    var wetlandTotal = wetland.reduce(function (sum, value) { return sum + value; }, 0);
-    var forestTotal = forest.reduce(function (sum, value) { return sum + value; }, 0);
-    var grandTotal = wetlandTotal + forestTotal;
+        var months = [
+            'बैशाख (Baishakh)',
+            'जेठ (Jeth)',
+            'असार (Asar)',
+            'साउन (Sawan)',
+            'भदौ (Bhadau)',
+            'असोज (Asoj)',
+            'कात्तिक (Kartik)',
+            'मङ्सिर (Mangsir)',
+            'पुस (Poush)',
+            'माघ (Magh)',
+            'फागुन (Falgun)',
+            'चैत (Chait)',
+        ];
 
-    var fontFamily = "'Mukta', 'Noto Sans', sans-serif";
-
-    new Chart(ctx, {
-        type: 'line',
-        data: {
-            labels: months,
-            datasets: [
-                {
-                    label: 'सिमसार तथा जलपक्षी',
-                    data: wetland,
-                    borderColor: '#059669',
-                    backgroundColor: gradient,
-                    fill: true,
-                    tension: 0.4,
-                    borderWidth: 3,
-                    pointRadius: 3,
-                    pointHoverRadius: 6,
-                    pointBackgroundColor: '#ffffff',
-                    pointBorderColor: '#059669',
-                    pointBorderWidth: 2,
-                    pointHoverBackgroundColor: '#059669',
-                    pointHoverBorderColor: '#ffffff',
-                },
-                {
-                    label: 'जङ्गल तथा घाँसे मैदानका पक्षी',
-                    data: forest,
-                    borderColor: '#f59e0b',
-                    backgroundColor: 'rgba(245, 158, 11, 0.08)',
-                    fill: true,
-                    tension: 0.4,
-                    borderWidth: 3,
-                    borderDash: [6, 4],
-                    pointRadius: 3,
-                    pointHoverRadius: 6,
-                    pointBackgroundColor: '#ffffff',
-                    pointBorderColor: '#f59e0b',
-                    pointBorderWidth: 2,
-                    pointHoverBackgroundColor: '#f59e0b',
-                    pointHoverBorderColor: '#ffffff',
-                },
-            ],
-        },
-        options: {
-            responsive: true,
-            maintainAspectRatio: false,
-            interaction: {
-                mode: 'index',
-                intersect: false,
+        var seriesMeta = [
+            {
+                ne: 'सिमसार तथा जलपक्षी',
+                en: 'Wetland & Waterbirds',
+                color: '#059669',
+                data: [12, 13, 17, 18, 16, 15, 17, 20, 21, 20, 15, 12],
             },
-            layout: {
-                padding: {
-                    top: 8,
-                    right: 8,
-                    bottom: 4,
-                    left: 4,
-                },
+            {
+                ne: 'जङ्गल तथा घाँसे मैदानका पक्षी',
+                en: 'Forest & Grassland Birds',
+                color: '#f59e0b',
+                data: [6, 6, 8, 9, 8, 7, 9, 10, 11, 10, 8, 6],
             },
-            animation: {
-                duration: 1600,
-                easing: 'easeOutQuart',
+        ];
+
+        var grandTotal = seriesMeta.reduce(function (sum, series) {
+            return sum + series.data.reduce(function (a, b) { return a + b; }, 0);
+        }, 0);
+
+        var chart = new Chart(ctx, {
+            type: 'line',
+            data: {
+                labels: months,
+                datasets: seriesMeta.map(function (series, index) {
+                    return {
+                        label: series.en,
+                        data: series.data,
+                        borderColor: series.color,
+                        backgroundColor: index === 0 ? gradient : 'rgba(245, 158, 11, 0.08)',
+                        fill: true,
+                        tension: 0.4,
+                        borderWidth: 3,
+                        borderDash: index === 0 ? undefined : [6, 4],
+                        pointRadius: 3,
+                        pointHoverRadius: 6,
+                        pointBackgroundColor: '#ffffff',
+                        pointBorderColor: series.color,
+                        pointBorderWidth: 2,
+                        pointHoverBackgroundColor: series.color,
+                        pointHoverBorderColor: '#ffffff',
+                    };
+                }),
             },
-            plugins: {
-                legend: {
-                    position: 'top',
-                    align: 'end',
-                    labels: {
-                        usePointStyle: true,
-                        pointStyle: 'circle',
-                        boxWidth: 8,
-                        boxHeight: 8,
-                        color: '#374151',
-                        padding: 14,
-                        font: {
-                            family: fontFamily,
-                            size: 13,
-                            weight: '600',
-                        },
-                    },
-                },
-                tooltip: {
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                interaction: {
                     mode: 'index',
                     intersect: false,
-                    backgroundColor: 'rgba(2, 44, 34, 0.96)',
-                    titleColor: '#fbbf24',
-                    bodyColor: '#ffffff',
-                    borderColor: 'rgba(255, 255, 255, 0.12)',
-                    borderWidth: 1,
-                    cornerRadius: 10,
-                    padding: 12,
-                    caretSize: 6,
-                    titleFont: {
-                        family: fontFamily,
-                        size: 14,
-                        weight: '700',
+                },
+                layout: {
+                    padding: {
+                        top: 8,
+                        right: 8,
+                        bottom: 4,
+                        left: 4,
                     },
-                    bodyFont: {
-                        family: fontFamily,
-                        size: 13,
+                },
+                animation: {
+                    duration: 1600,
+                    easing: 'easeOutQuart',
+                },
+                plugins: {
+                    legend: {
+                        display: false,
                     },
-                    footerFont: {
-                        family: fontFamily,
-                        size: 12,
-                        weight: '600',
-                    },
-                    usePointStyle: true,
-                    callbacks: {
-                        title: function (context) {
-                            return 'महिना: ' + context[0].label;
+                    tooltip: {
+                        enabled: true,
+                        mode: 'index',
+                        intersect: false,
+                        position: 'nearest',
+                        external: function (context) {
+                            if (!tooltipEl) return;
+
+                            var tooltip = context.tooltip;
+
+                            if (tooltip.opacity === 0) {
+                                tooltipEl.style.opacity = '0';
+                                return;
+                            }
+
+                            var title = tooltip.title.length ? tooltip.title[0] : '';
+
+                            var rows = tooltip.dataPoints.map(function (point) {
+                                var meta = seriesMeta[point.datasetIndex];
+                                if (!meta) return '';
+                                return (
+                                    '<div class="gh-tip-row">' +
+                                    '<span class="gh-tip-dot" style="background:' + meta.color + '"></span>' +
+                                    '<span lang="ne">' + meta.ne + ': <strong>' + point.parsed.y + '</strong></span>' +
+                                    ' <span>/ ' + meta.en + ': ' + point.parsed.y + ' species</span>' +
+                                    '</div>'
+                                );
+                            }).join('');
+
+                            tooltipEl.innerHTML =
+                                '<div class="gh-tip-title" lang="ne">' + title + '</div>' +
+                                rows +
+                                '<div class="gh-tip-total" lang="ne">जम्मा: ' + grandTotal + ' प्रजाति (२९०+)</div>' +
+                                '<div class="gh-tip-total-en">/ Total: ' + grandTotal + ' species (290+)</div>';
+
+                            tooltipEl.style.opacity = '1';
+
+                            var tooltipWidth = tooltipEl.offsetWidth;
+                            var tooltipHeight = tooltipEl.offsetHeight;
+                            var wrapperWidth = wrapper.clientWidth;
+
+                            var left = Math.min(Math.max(tooltip.caretX, tooltipWidth / 2 + 6), Math.max(tooltipWidth / 2 + 6, wrapperWidth - tooltipWidth / 2 - 6));
+                            var top = tooltip.caretY - tooltipHeight - 14;
+
+                            if (top < 4) {
+                                top = tooltip.caretY + 14;
+                            }
+
+                            tooltipEl.style.left = left + 'px';
+                            tooltipEl.style.top = top + 'px';
                         },
-                        label: function (context) {
-                            return ' ' + context.dataset.label + ': ' + context.parsed.y + ' प्रजाति';
+                    },
+                },
+                scales: {
+                    x: {
+                        grid: {
+                            display: false,
                         },
-                        footer: function () {
-                            return 'जम्मा: ' + grandTotal.toLocaleString('ne-NP') + ' प्रजाति (२९०+)';
+                        border: {
+                            color: 'rgba(2, 44, 34, 0.2)',
+                        },
+                        ticks: {
+                            color: '#6b7280',
+                            font: {
+                                family: fontFamily,
+                                size: 11,
+                            },
+                            autoSkip: true,
+                            maxRotation: 0,
+                            minRotation: 0,
+                        },
+                    },
+                    y: {
+                        beginAtZero: true,
+                        grid: {
+                            color: 'rgba(2, 44, 34, 0.06)',
+                        },
+                        border: {
+                            display: false,
+                        },
+                        ticks: {
+                            color: '#6b7280',
+                            font: {
+                                family: fontFamily,
+                                size: 12,
+                            },
+                            precision: 0,
+                            callback: function (value) {
+                                return value + ' species';
+                            },
                         },
                     },
                 },
             },
-            scales: {
-                x: {
-                    grid: {
-                        display: false,
-                    },
-                    border: {
-                        color: 'rgba(2, 44, 34, 0.2)',
-                    },
-                    ticks: {
-                        color: '#6b7280',
-                        font: {
-                            family: fontFamily,
-                            size: 12,
-                        },
-                        autoSkip: true,
-                        maxTicksLimit: 12,
-                        maxRotation: 0,
-                    },
-                },
-                y: {
-                    beginAtZero: true,
-                    grid: {
-                        color: 'rgba(2, 44, 34, 0.06)',
-                    },
-                    border: {
-                        display: false,
-                    },
-                    ticks: {
-                        color: '#6b7280',
-                        font: {
-                            family: fontFamily,
-                            size: 12,
-                        },
-                        precision: 0,
-                        callback: function (value) {
-                            return value + ' प्रजाति';
-                        },
-                    },
-                },
-            },
-        },
+        });
+
+        if (legendEl) {
+            function buildLegend() {
+                legendEl.innerHTML = '';
+                seriesMeta.forEach(function (meta, index) {
+                    var item = document.createElement('button');
+                    item.type = 'button';
+                    item.className = 'ghodaghodi-legend-item';
+                    item.setAttribute('aria-pressed', String(true));
+                    item.innerHTML =
+                        '<span class="ghodaghodi-legend-dot" style="background:' + meta.color + '"></span>' +
+                        '<span lang="ne">' + meta.ne + '</span>' +
+                        '<span class="ghodaghodi-legend-sep" role="presentation">/</span>' +
+                        '<span>' + meta.en + '</span>';
+
+                    item.addEventListener('click', function () {
+                        var visible = chart.isDatasetVisible(index);
+                        chart.setDatasetVisibility(index, !visible);
+                        chart.update();
+                        item.classList.toggle('ghodaghodi-legend-muted', visible);
+                        item.setAttribute('aria-pressed', String(!visible));
+                        item.setAttribute('aria-label', (!visible ? 'Show ' : 'Hide ') + meta.en);
+                    });
+
+                    legendEl.appendChild(item);
+                });
+            }
+
+            buildLegend();
+        }
     });
-});
+})();
