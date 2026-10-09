@@ -1212,3 +1212,106 @@ add_action('admin_post_nopriv_ghodaghodi_contact_submit', 'ghodaghodi_contact_su
 require_once get_template_directory() . '/inc/template-tags.php';
 require_once get_template_directory() . '/inc/walker.php';
 require_once get_template_directory() . '/inc/customizer.php';
+
+/**
+ * 1. Register Custom Post Type for Tourist Spots
+ */
+function register_tourist_spot_cpt()
+{
+    $args = [
+        'labels' => [
+            'name'               => __('Tourist Spots', 'ghodaghodi-view'),
+            'singular_name'      => __('Tourist Spot', 'ghodaghodi-view'),
+            'add_new'            => __('Add New Spot', 'ghodaghodi-view'),
+            'add_new_item'       => __('Add New Tourist Spot', 'ghodaghodi-view'),
+            'edit_item'          => __('Edit Tourist Spot', 'ghodaghodi-view'),
+            'new_item'           => __('New Tourist Spot', 'ghodaghodi-view'),
+            'view_item'          => __('View Tourist Spot', 'ghodaghodi-view'),
+            'search_items'       => __('Search Tourist Spots', 'ghodaghodi-view'),
+            'not_found'          => __('No tourist spots found', 'ghodaghodi-view'),
+        ],
+        'public'             => true,
+        'has_archive'        => true,
+        'publicly_queryable' => true,
+        'show_ui'            => true,
+        'show_in_menu'       => true,
+        'show_in_rest'       => true, // Gutenberg editor र REST API सपोर्टको लागि अनिवार्य
+        'supports'           => ['title', 'editor', 'thumbnail', 'custom-fields'],
+        'menu_icon'          => 'dashicons-location-alt',
+    ];
+    register_post_type('tourist_spot', $args);
+}
+add_action('init', 'register_tourist_spot_cpt');
+
+
+/**
+ * 2. Register REST API Endpoint to Receive Kobo Data
+ */
+function register_kobo_receiver_endpoint()
+{
+    register_rest_route('kobo/v1', '/receiver', [
+        'methods'             => 'POST',
+        'callback'            => 'handle_kobo_submission',
+        'permission_callback' => '__return_true', // सुरक्षाको लागि पछि token check थप्न सकिन्छ
+    ]);
+}
+add_action('rest_api_init', 'register_kobo_receiver_endpoint');
+
+
+/**
+ * 3. Handle the Incoming Data and Create Post
+ */
+function handle_kobo_submission(WP_REST_Request $request)
+{
+    // Kobo बाट आएको JSON डाटा लिनुहोस्
+    $params = $request->get_json_params();
+
+    // Kobo को डाटा structure अनुसार मुख्य डाटा पत्ता लगाउने
+    $data = isset($params['data']) ? $params['data'] : $params;
+
+    // यदि डाटा खाली छ भने Error पठाउने
+    if (empty($data)) {
+        return new WP_REST_Response([
+            'status'  => 'error',
+            'message' => 'No data received.'
+        ], 400);
+    }
+
+    // ==========================================
+    // Kobo Form मा भएका Question Field Keys अनुसार म्याप गर्नुहोस्
+    // ==========================================
+    $spot_name        = sanitize_text_field($data['spot_name'] ?? 'Untitled Spot');
+    $spot_description = sanitize_textarea_field($data['spot_description'] ?? '');
+    $latitude         = sanitize_text_field($data['latitude'] ?? '');
+    $longitude        = sanitize_text_field($data['longitude'] ?? '');
+    $kobo_submission_id = sanitize_text_field($data['_id'] ?? '');
+
+    // WordPress मा नयाँ Custom Post सिर्जना गर्ने
+    $post_data = [
+        'post_title'   => $spot_name,
+        'post_content' => $spot_description,
+        'post_type'    => 'tourist_spot',
+        'post_status'  => 'publish', // सीधै publish गराउन 'publish', समीक्षा पछि राख्न 'draft' बनाउन सक्नुहुन्छ
+    ];
+
+    $post_id = wp_insert_post($post_data);
+
+    if (is_wp_error($post_id)) {
+        return new WP_REST_Response([
+            'status'  => 'error',
+            'message' => $post_id->get_error_message()
+        ], 500);
+    }
+
+    // अतिरिक्त जानकारी (Custom Fields / Post Meta) मा सेभ गर्ने
+    update_post_meta($post_id, 'kobo_submission_id', $kobo_submission_id);
+    update_post_meta($post_id, 'latitude', $latitude);
+    update_post_meta($post_id, 'longitude', $longitude);
+
+    // सफलताको सन्देश फर्काउने
+    return rest_ensure_response([
+        'status'  => 'success',
+        'message' => 'Tourist spot created successfully!',
+        'post_id' => $post_id
+    ]);
+}
